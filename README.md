@@ -76,35 +76,35 @@ Three pods, five people each, one lead per pod. The Architect talks to three pod
 
 One person, one data structure, one algorithm, paired so each explains the other.
 
-### Pod A
+### Pod A — Reynolds (Architect) + Constance
 
-| ID | Structure | Algorithm | Spine role |
-|---|---|---|---|
-| A1 | Dynamic array | Binary search | **Architect & Integrator** |
-| A2 | Linked list + iterator | Linear search | Pod A Lead |
-| A3 | Stack | DFS | Data & Database Owner |
-| A4 | Queue + circular queue | BFS | Test & Harness Owner |
-| A5 | Deque | Insertion sort | — |
+| ID | Owner | Structure | Algorithm | Spine role |
+|---|---|---|---|---|
+| A1 | Fenuku Reynolds Elikem | Dynamic array | Binary search | **Architect & Integrator** |
+| A2 | Mensah Constance Awura Adwoa | Linked list + iterator | Linear search | Pod A Lead |
+| A3 | Kena-Bonti Gabriel | Stack | DFS | Data & Database Owner |
+| A4 | Amoaku Emefa Deotormenyo | Queue + circular queue | BFS | Test & Harness Owner |
+| A5 | Dzebu Daniel Selorm Yaw | Deque | Insertion sort | — |
 
-### Pod B
+### Pod B — Joel + Yvonne
 
-| ID | Structure | Algorithm | Spine role |
-|---|---|---|---|
-| B1 | BST | Quicksort | — |
-| B2 | AVL (balanced tree) | Merge sort | Pod B Lead |
-| B3 | B-tree | Brute force | — |
-| B4 | Hash table | Selection sort | — |
-| B5 | Map | Efficiency analysis | Efficiency Lab Owner |
+| ID | Owner | Structure | Algorithm | Spine role |
+|---|---|---|---|---|
+| B1 | Tenkorang Roland Yeboah | BST | Quicksort | — |
+| B2 | Ansah Joel Eugene | AVL (balanced tree) | Merge sort | Pod B Lead |
+| B3 | Gyankomah Samuel Offei-Dei | B-tree | Brute force | — |
+| B4 | Ohemeng Yvonne Darkoa | Hash table | Selection sort | — |
+| B5 | Oti-Antwi Fremponmaa | Map | Efficiency analysis | Efficiency Lab Owner |
 
-### Pod C
+### Pod C — Bless + Williams
 
-| ID | Structure | Algorithm | Spine role |
-|---|---|---|---|
-| C1 | Set | Greedy + counterexample | Report Editor & Evidence Registrar |
-| C2 | Heap / priority queue | Dijkstra | Pod C Lead |
-| C3 | Disjoint set | Kruskal | — |
-| C4 | Graph, adjacency list | Prim | — |
-| C5 | Graph, adjacency matrix | DP knapsack | — |
+| ID | Owner | Structure | Algorithm | Spine role |
+|---|---|---|---|---|
+| C1 | Antwi Prince Walker | Set | Greedy + counterexample | Report Editor & Evidence Registrar |
+| C2 | Nutsua Bless Yesutor | Heap / priority queue | Dijkstra | Pod C Lead |
+| C3 | Ayim Obed Boateng | Disjoint set | Kruskal | — |
+| C4 | Botwe Michael | Graph, adjacency list | Prim | — |
+| C5 | Jarawura Williams Koyiri | Graph, adjacency matrix | DP knapsack | — |
 
 **Backup rule:** your backup is the next row in your pod (last wraps to first). Backups start reading your code in Week 1. Go dark 48 hours past a checkpoint and your backup implements your slot — you still defend it orally, which the brief requires personally of you regardless of who wrote it.
 
@@ -183,10 +183,20 @@ At oral defense, every member explains their structure and algorithm: what it do
 
 ---
 
+## Reference docs
+
+This README is the up-to-date, comprehensive version — read this first. The files below hold supporting detail this README summarizes or supersedes:
+
+- [`docs/team-charter.md`](docs/team-charter.md) — the original charter document. §§1–11 here are drawn from it; kept for the fuller prose version of the same allocation logic.
+- [`docs/brief.md`](docs/brief.md) — condensed assignment brief; [`docs/original/`](docs/original/) has the unmodified submitted docx files.
+- [`docs/checklist-cover-sheet.md`](docs/checklist-cover-sheet.md) — editable submission checklist; fill in as work completes, transcribe to the original docx before final submission.
+- [`docs/starting-your-slot.md`](docs/starting-your-slot.md) — step-by-step guide for a new member starting their slot.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — branch/PR workflow and Definition-of-Done enforcement.
+
 ## Repo layout
 
 ```
-docs/            brief, checklist, original docx files
+docs/            brief, checklist, charter, starting-your-slot guide, original docx files
 sql/             schema.sql + seed CSVs
 src/main/java/gsoo/
   structures/    one folder per slot's data structure
@@ -198,5 +208,3 @@ src/test/java/gsoo/   mirrors structures/ and algorithms/
 experiments/     csv/ and plots/
 report/
 ```
-
-See `CONTRIBUTING.md` for the branch/PR workflow and Definition of Done enforcement.
