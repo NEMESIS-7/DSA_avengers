@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="gsoo.structures.b3_btree.BTreeTest" time="0.015" tests="4" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="gsoo.algorithms.b3_brute_force.BruteForceAssignmentTest" time="0.052" tests="4" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -60,8 +60,8 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="search_forKeyNeverInserted_returnsNull" classname="gsoo.structures.b3_btree.BTreeTest" time="0.005"/>
-  <testcase name="insertAndSearch_returnsCorrectValuesForExistingKeys" classname="gsoo.structures.b3_btree.BTreeTest" time="0.001"/>
-  <testcase name="insert_withNullKey_throwsException" classname="gsoo.structures.b3_btree.BTreeTest" time="0.001"/>
-  <testcase name="insert_triggersSplit_allKeysStillFindableAfterward" classname="gsoo.structures.b3_btree.BTreeTest" time="0.003"/>
+  <testcase name="solve_normalCase_findsMinimumCostAssignment" classname="gsoo.algorithms.b3_brute_force.BruteForceAssignmentTest" time="0.021"/>
+  <testcase name="solve_nonSquareMatrix_throwsIllegalArgumentException" classname="gsoo.algorithms.b3_brute_force.BruteForceAssignmentTest" time="0.007"/>
+  <testcase name="solve_nullMatrix_throwsNullPointerException" classname="gsoo.algorithms.b3_brute_force.BruteForceAssignmentTest" time="0.001"/>
+  <testcase name="solve_boundaryCase_singlePorterSingleJob" classname="gsoo.algorithms.b3_brute_force.BruteForceAssignmentTest" time="0.0"/>
 </testsuite>
