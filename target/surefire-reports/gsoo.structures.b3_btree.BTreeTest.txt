@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: gsoo.structures.b3_btree.BTreeTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.050 s -- in gsoo.structures.b3_btree.BTreeTest
