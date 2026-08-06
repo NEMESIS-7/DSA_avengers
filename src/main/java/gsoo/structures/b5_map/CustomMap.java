@@ -1,4 +1,4 @@
-package gsoo.structures;
+package gsoo.structures.b5_map;
 
 /**
  * Slot B5 — Custom Map (association-array based, no java.util.Map/HashMap/TreeMap used).

@@ -1,4 +1,4 @@
-package gsoo.structures;
+package gsoo.structures.b5_map;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
