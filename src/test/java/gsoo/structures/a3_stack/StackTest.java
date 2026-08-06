@@ -39,4 +39,23 @@ public class StackTest {
         assertThrows(IllegalStateException.class, stack::pop);
         assertThrows(IllegalStateException.class, stack::peek);
     }
+
+    @Test
+    void invalidCase_pushingNullThrows() {
+        Stack<Integer> stack = new Stack<>();
+
+        assertThrows(IllegalArgumentException.class, () -> stack.push(null));
+    }
+
+    @Test
+    void lifoOrder_isPreservedAcrossMultiplePushesAndPops() {
+        Stack<Integer> stack = new Stack<>();
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+
+        assertEquals(3, stack.pop());
+        assertEquals(2, stack.pop());
+        assertEquals(1, stack.pop());
+    }
 }

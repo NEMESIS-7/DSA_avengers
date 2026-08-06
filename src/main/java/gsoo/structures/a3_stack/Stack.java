@@ -26,6 +26,9 @@ public class Stack<T> {
     // ---------------- Core operations ----------------
 
     public void push(T item) {
+        if (item == null) {
+            throw new IllegalArgumentException("Cannot push null onto the stack");
+        }
         if (size == data.length) {
             resize(data.length * 2);   // double the array when it's full
         }
