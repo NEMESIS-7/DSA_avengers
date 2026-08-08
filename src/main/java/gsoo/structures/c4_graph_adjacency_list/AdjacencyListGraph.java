@@ -1,8 +1,7 @@
 package gsoo.structures.c4_graph_adjacency_list;
 
 import gsoo.structures.Graph;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class AdjacencyListGraph implements Graph {
 
@@ -20,16 +19,14 @@ public class AdjacencyListGraph implements Graph {
         }
     }
 
-    private static final int INITIAL_NODE_CAPACITY = 16;
-
     private NodeEntry[] nodes;
     private int nodeCount;
     private int totalEdgeCount;
 
     public AdjacencyListGraph() {
-        this.nodes = new NodeEntry[INITIAL_NODE_CAPACITY];
-        this.nodeCount = 0;
-        this.totalEdgeCount = 0;
+        nodes = new NodeEntry[16];
+        nodeCount = 0;
+        totalEdgeCount = 0;
     }
 
     private int findNodeIndex(String id) {
@@ -72,7 +69,9 @@ public class AdjacencyListGraph implements Graph {
         growNodesArrayIfNeeded();
         nodes[nodeCount] = new NodeEntry(id, type);
         nodeCount++;
-    }@Override
+    }
+
+    @Override
     public void addEdge(String fromId, String toId,
                          double distanceMetres, double travelTimeSecs,
                          double roadConditionWeight, boolean directed) {
@@ -93,17 +92,11 @@ public class AdjacencyListGraph implements Graph {
         Edge edge = new Edge(fromId, toId, distanceMetres, travelTimeSecs,
                               roadConditionWeight, directed);
 
-        // Store the SAME edge object on both endpoints, regardless of
-        // `directed`. This is what makes getConnections() work correctly --
-        // a one-way road A->B still shows up as a physical connection when
-        // you look from B's side. getNeighbors() is the one that filters
-        // by direction later, not this storage step.
         NodeEntry fromNode = nodes[fromIndex];
         growEdgesArrayIfNeeded(fromNode);
         fromNode.edges[fromNode.edgeCount] = edge;
         fromNode.edgeCount++;
 
-        // Avoid double-storing a self-loop (fromId == toId) twice.
         if (!fromId.equals(toId)) {
             NodeEntry toNode = nodes[toIndex];
             growEdgesArrayIfNeeded(toNode);
@@ -131,7 +124,9 @@ public class AdjacencyListGraph implements Graph {
             }
         }
         return false;
-    }@Override
+    }
+
+    @Override
     public boolean hasNode(String id) {
         return findNodeIndex(id) != -1;
     }
@@ -156,63 +151,80 @@ public class AdjacencyListGraph implements Graph {
     }
 
     @Override
-    public List<String> getAllNodeIds() {
-        List<String> ids = new ArrayList<>();
+    public String[] getAllNodeIds() {
+        String[] ids = new String[nodeCount];
         for (int i = 0; i < nodeCount; i++) {
-            ids.add(nodes[i].id);
+            ids[i] = nodes[i].id;
         }
         return ids;
-    }@Override
-    public List<Edge> getAllEdges() {
-        List<Edge> allEdges = new ArrayList<>();
+    }
+
+    @Override
+    public Edge[] getAllEdges() {
+        int count = 0;
+        for (int i = 0; i < nodeCount; i++) {
+            NodeEntry node = nodes[i];
+            for (int j = 0; j < node.edgeCount; j++) {
+                if (node.edges[j].fromId.equals(node.id)) {
+                    count++;
+                }
+            }
+        }
+
+        Edge[] result = new Edge[count];
+        int index = 0;
         for (int i = 0; i < nodeCount; i++) {
             NodeEntry node = nodes[i];
             for (int j = 0; j < node.edgeCount; j++) {
                 Edge e = node.edges[j];
-                // Every edge is stored on its fromNode first (see addEdge),
-                // and only ALSO on its toNode if fromId != toId. So counting
-                // an edge only when we're currently looking at its fromNode
-                // guarantees each edge is added to the result exactly once,
-                // with no extra "seen" tracking needed.
                 if (e.fromId.equals(node.id)) {
-                    allEdges.add(e);
+                    result[index] = e;
+                    index++;
                 }
             }
         }
-        return allEdges;
+        return result;
     }
 
     @Override
-    public List<Edge> getNeighbors(String nodeId) {
+    public Edge[] getNeighbors(String nodeId) {
         int index = findNodeIndex(nodeId);
         if (index == -1) {
             throw new IllegalArgumentException("Unknown node id: " + nodeId);
         }
         NodeEntry node = nodes[index];
-        List<Edge> legalEdges = new ArrayList<>();
+
+        int count = 0;
         for (int i = 0; i < node.edgeCount; i++) {
             Edge e = node.edges[i];
-            // Undirected edges are always legal from either endpoint.
-            // Directed edges are only legal starting from their fromId.
-            boolean legalFromHere = !e.directed || e.fromId.equals(nodeId);
-            if (legalFromHere) {
-                legalEdges.add(e);
+            if (!e.directed || e.fromId.equals(nodeId)) {
+                count++;
             }
         }
-        return legalEdges;
+
+        Edge[] result = new Edge[count];
+        int pos = 0;
+        for (int i = 0; i < node.edgeCount; i++) {
+            Edge e = node.edges[i];
+            if (!e.directed || e.fromId.equals(nodeId)) {
+                result[pos] = e;
+                pos++;
+            }
+        }
+        return result;
     }
 
     @Override
-    public List<Edge> getConnections(String nodeId) {
+    public Edge[] getConnections(String nodeId) {
         int index = findNodeIndex(nodeId);
         if (index == -1) {
             throw new IllegalArgumentException("Unknown node id: " + nodeId);
         }
         NodeEntry node = nodes[index];
-        List<Edge> connections = new ArrayList<>();
+        Edge[] result = new Edge[node.edgeCount];
         for (int i = 0; i < node.edgeCount; i++) {
-            connections.add(node.edges[i]);
+            result[i] = node.edges[i];
         }
-        return connections;
+        return result;
     }
 }
