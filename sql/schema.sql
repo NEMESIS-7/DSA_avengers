@@ -32,6 +32,7 @@ CREATE TABLE roads (
     road_id                 TEXT PRIMARY KEY,
     from_location_id        TEXT NOT NULL REFERENCES locations(location_id),
     to_location_id          TEXT NOT NULL REFERENCES locations(location_id),
+    road_name               TEXT,                            -- e.g. 'Agomeda Township to Agomeda Health Centre Road' — display/reporting only, no algorithm reads this
     distance_m              REAL NOT NULL,
     travel_time_s           REAL NOT NULL,
     road_condition_weight   REAL NOT NULL DEFAULT 1.0,   -- 1.0 = good/flat, up to 2.5-3.0
@@ -66,6 +67,7 @@ CREATE TABLE service_requests (
                                 'SPECIMEN', 'DRUG_DELIVERY', 'BLOOD', 'STERILE_SUPPLY',
                                 'EQUIPMENT', 'MEALS', 'LINEN', 'MAINTENANCE',
                                 'MORTUARY_TRANSFER')),
+    patient_ref              TEXT,                          -- synthetic patient reference (e.g. 'PAT-0011'); NULL for non-patient-specific categories: STERILE_SUPPLY, EQUIPMENT, LINEN, MAINTENANCE — this is what B4's hash table keys on
     source_location_id      TEXT NOT NULL REFERENCES locations(location_id),
     destination_location_id TEXT NOT NULL REFERENCES locations(location_id),
     urgency                 INTEGER NOT NULL CHECK (urgency BETWEEN 1 AND 5),
@@ -78,6 +80,7 @@ CREATE TABLE service_requests (
 
 CREATE INDEX idx_requests_status  ON service_requests(status);
 CREATE INDEX idx_requests_urgency ON service_requests(urgency);
+CREATE INDEX idx_requests_patient ON service_requests(patient_ref);
 
 -- ------------------------------------------------------------
 -- 5. AUDIT EVENTS  (your table — feeds your Stack/undo-dispatch)

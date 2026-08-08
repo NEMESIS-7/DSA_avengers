@@ -1,101 +1,101 @@
-road_id,from_location_id,to_location_id,distance_m,travel_time_s,road_condition_weight,is_closed
-R-001,EXT-C01,EXT-HC02,2412,325,1.4,0
-R-002,EXT-C02,EXT-H01,3753,550,1.0,0
-R-003,EXT-C03,EXT-HC02,2643,404,1.4,0
-R-004,EXT-C04,EXT-HC01,5967,389,1.4,0
-R-005,EXT-C05,EXT-HC03,4956,332,1.0,0
-R-006,EXT-C06,EXT-H02,2267,523,1.0,0
-R-007,EXT-C07,EXT-HC01,5639,327,1.4,0
-R-008,EXT-C08,EXT-HC03,3128,858,1.0,0
-R-009,EXT-H01,EXT-HC02,3805,819,1.8,0
-R-010,EXT-H02,GATE-01,5561,439,1.0,0
-R-011,EXT-H03,EXT-HC01,5462,708,1.4,0
-R-012,EXT-H04,EXT-HC03,3273,580,1.4,0
-R-013,EXT-H05,EXT-HC04,2837,454,1.4,0
-R-014,EXT-H06,EXT-HC04,2792,727,1.4,0
-R-015,EXT-HC01,GATE-01,8945,1141,1.0,0
-R-016,EXT-HC02,GATE-01,9977,1540,1.8,0
-R-017,EXT-HC03,GATE-01,5022,1375,1.0,0
-R-018,EXT-HC04,GATE-01,8522,1200,1.8,0
-R-019,GATE-01,EXT-R01,39000,2700,1.0,0
-R-020,EXT-C01,EXT-H01,6566,1040,1.4,0
-R-021,EXT-C02,EXT-HC02,6229,693,1.0,0
-R-022,EXT-C03,EXT-H02,7271,442,1.4,0
-R-023,EXT-C04,EXT-H03,1875,766,1.8,0
-R-024,EXT-C05,EXT-H04,7832,892,1.4,0
-R-025,EXT-C06,EXT-HC01,2153,776,1.0,0
-R-026,EXT-C07,EXT-H03,8598,506,1.4,0
-R-027,EXT-C08,EXT-H06,4613,869,1.8,0
-R-028,EXT-H01,EXT-H02,5214,1047,1.4,0
-R-029,EXT-H03,EXT-HC02,2832,1058,1.8,0
-R-030,EXT-H04,EXT-H06,4410,729,1.4,0
-R-031,EXT-H05,EXT-H06,6990,846,1.0,0
-R-032,EXT-HC01,EXT-HC02,7249,446,1.4,0
-R-033,EXT-HC02,EXT-HC03,6490,650,1.8,0
-R-034,EXT-HC03,EXT-HC04,5875,801,1.4,0
-R-035,EXT-H02,GATE-01,2838,1246,2.5,0
-R-036,GATE-01,INT-08,63,89,1.0,0
-R-037,GATE-01,INT-01,96,162,1.3,0
-R-038,INT-01,INT-02,43,103,1.0,0
-R-039,INT-01,INT-03,113,34,1.0,0
-R-040,INT-01,INT-04,44,28,1.3,0
-R-041,INT-03,INT-08,118,100,1.0,0
-R-042,INT-03,INT-05,66,88,1.3,0
-R-043,INT-04,INT-05,23,74,1.0,0
-R-044,INT-05,INT-06,87,100,1.0,0
-R-045,INT-06,INT-07,42,147,1.0,0
-R-046,INT-08,INT-14,65,137,1.6,0
-R-047,INT-08,INT-09,33,87,1.3,0
-R-048,INT-08,INT-10,32,83,1.3,0
-R-049,INT-08,INT-22,110,163,1.6,0
-R-050,INT-09,INT-10,83,87,1.0,0
-R-051,INT-10,INT-11,110,169,1.0,0
-R-052,INT-11,INT-12,69,169,1.0,0
-R-053,INT-12,INT-13,66,112,1.0,0
-R-054,INT-14,INT-15,43,55,1.0,0
-R-055,INT-15,INT-16,80,146,1.0,0
-R-056,INT-14,INT-23,26,32,2.0,0
-R-057,INT-15,INT-23,29,59,2.0,0
-R-058,INT-17,INT-18,95,60,1.0,0
-R-059,INT-18,INT-19,116,128,1.0,0
-R-060,INT-09,INT-17,91,36,1.3,0
-R-061,INT-10,INT-17,64,117,1.3,0
-R-062,INT-11,INT-17,91,139,1.3,0
-R-063,INT-12,INT-17,82,84,1.3,0
-R-064,INT-13,INT-17,85,22,1.3,0
-R-065,INT-20,INT-21,102,49,1.0,0
-R-066,INT-21,INT-09,102,157,1.3,0
-R-067,INT-21,INT-10,111,88,1.3,0
-R-068,INT-21,INT-11,113,107,1.3,0
-R-069,INT-21,INT-12,29,95,1.3,0
-R-070,INT-21,INT-13,70,60,1.3,0
-R-071,INT-22,INT-14,73,20,1.6,0
-R-072,INT-22,INT-15,107,87,1.6,0
-R-073,INT-22,INT-12,79,65,1.3,0
-R-074,INT-24,INT-09,79,47,3.0,0
-R-075,INT-24,INT-10,95,96,3.0,0
-R-076,INT-24,INT-08,96,149,1.6,0
-R-077,INT-25,INT-26,92,70,1.0,0
-R-078,INT-25,INT-09,34,115,1.0,0
-R-079,INT-25,INT-10,112,61,1.0,0
-R-080,INT-25,INT-11,84,155,1.0,0
-R-081,INT-25,INT-12,15,173,1.0,0
-R-082,INT-25,INT-13,56,145,1.0,0
-R-083,INT-26,INT-09,17,48,1.0,0
-R-084,INT-26,INT-10,61,98,1.0,0
-R-085,INT-26,INT-11,45,34,1.0,0
-R-086,INT-26,INT-12,45,165,1.0,0
-R-087,INT-26,INT-13,25,41,1.0,0
-R-088,INT-27,INT-14,108,144,1.3,0
-R-089,INT-27,INT-17,119,37,1.3,0
-R-090,INT-27,INT-18,112,156,1.3,0
-R-091,INT-28,INT-20,113,52,1.0,0
-R-092,INT-28,INT-23,31,141,1.0,0
-R-093,INT-29,INT-30,85,62,1.0,0
-R-094,INT-29,INT-01,48,155,1.0,0
-R-095,INT-29,INT-02,92,128,1.0,0
-R-096,INT-02,INT-30,19,93,1.0,0
-R-097,INT-06,INT-08,104,56,1.3,0
-R-098,INT-14,INT-08,74,114,1.6,0
-R-099,INT-20,INT-08,100,44,1.3,0
-R-100,INT-23,INT-08,73,173,1.6,0
+road_id,from_location_id,to_location_id,distance_m,travel_time_s,road_condition_weight,is_closed,road_name
+R-001,EXT-C01,EXT-HC02,2412,325,1.4,0,Agomeda Township to Agomeda Health Centre Road
+R-002,EXT-C02,EXT-H01,3753,550,1.0,0,Asabe to Ayikuma CHPS Compound Road
+R-003,EXT-C03,EXT-HC02,2643,404,1.4,0,Atsavanya to Agomeda Health Centre Road
+R-004,EXT-C04,EXT-HC01,5967,389,1.4,0,Dedenya to Duffor Health Centre Road
+R-005,EXT-C05,EXT-HC03,4956,332,1.0,0,Hwapa to Osudoku Health Centre Road
+R-006,EXT-C06,EXT-H02,2267,523,1.0,0,"Manya-Jorpanya to St. Andrew Catholic Hospital, Kordiabe Road"
+R-007,EXT-C07,EXT-HC01,5639,327,1.4,0,Odumase to Duffor Health Centre Road
+R-008,EXT-C08,EXT-HC03,3128,858,1.0,0,Wedokum to Osudoku Health Centre Road
+R-009,EXT-H01,EXT-HC02,3805,819,1.8,0,Ayikuma CHPS Compound to Agomeda Health Centre Road
+R-010,EXT-H02,GATE-01,5561,439,1.0,0,"St. Andrew Catholic Hospital, Kordiabe to Ambulance Bay Road"
+R-011,EXT-H03,EXT-HC01,5462,708,1.4,0,Doryumu CHPS Compound to Duffor Health Centre Road
+R-012,EXT-H04,EXT-HC03,3273,580,1.4,0,Kasunya CHPS Compound to Osudoku Health Centre Road
+R-013,EXT-H05,EXT-HC04,2837,454,1.4,0,Volivo CHPS Compound to Asutsuare Health Centre Road
+R-014,EXT-H06,EXT-HC04,2792,727,1.4,0,Sota CHPS Compound to Asutsuare Health Centre Road
+R-015,EXT-HC01,GATE-01,8945,1141,1.0,0,Duffor Health Centre to Ambulance Bay Road
+R-016,EXT-HC02,GATE-01,9977,1540,1.8,0,Agomeda Health Centre to Ambulance Bay Road
+R-017,EXT-HC03,GATE-01,5022,1375,1.0,0,Osudoku Health Centre to Ambulance Bay Road
+R-018,EXT-HC04,GATE-01,8522,1200,1.8,0,Asutsuare Health Centre to Ambulance Bay Road
+R-019,GATE-01,EXT-R01,39000,2700,1.0,0,Ambulance Bay to Greater Accra Regional Hospital Road
+R-020,EXT-C01,EXT-H01,6566,1040,1.4,0,Agomeda Township to Ayikuma CHPS Compound Road
+R-021,EXT-C02,EXT-HC02,6229,693,1.0,0,Asabe to Agomeda Health Centre Road
+R-022,EXT-C03,EXT-H02,7271,442,1.4,0,"Atsavanya to St. Andrew Catholic Hospital, Kordiabe Road"
+R-023,EXT-C04,EXT-H03,1875,766,1.8,0,Dedenya to Doryumu CHPS Compound Road
+R-024,EXT-C05,EXT-H04,7832,892,1.4,0,Hwapa to Kasunya CHPS Compound Road
+R-025,EXT-C06,EXT-HC01,2153,776,1.0,0,Manya-Jorpanya to Duffor Health Centre Road
+R-026,EXT-C07,EXT-H03,8598,506,1.4,0,Odumase to Doryumu CHPS Compound Road
+R-027,EXT-C08,EXT-H06,4613,869,1.8,0,Wedokum to Sota CHPS Compound Road
+R-028,EXT-H01,EXT-H02,5214,1047,1.4,0,"Ayikuma CHPS Compound to St. Andrew Catholic Hospital, Kordiabe Road"
+R-029,EXT-H03,EXT-HC02,2832,1058,1.8,0,Doryumu CHPS Compound to Agomeda Health Centre Road
+R-030,EXT-H04,EXT-H06,4410,729,1.4,0,Kasunya CHPS Compound to Sota CHPS Compound Road
+R-031,EXT-H05,EXT-H06,6990,846,1.0,0,Volivo CHPS Compound to Sota CHPS Compound Road
+R-032,EXT-HC01,EXT-HC02,7249,446,1.4,0,Duffor Health Centre to Agomeda Health Centre Road
+R-033,EXT-HC02,EXT-HC03,6490,650,1.8,0,Agomeda Health Centre to Osudoku Health Centre Road
+R-034,EXT-HC03,EXT-HC04,5875,801,1.4,0,Osudoku Health Centre to Asutsuare Health Centre Road
+R-035,EXT-H02,GATE-01,2838,1246,2.5,0,"St. Andrew Catholic Hospital, Kordiabe to Ambulance Bay Road"
+R-036,GATE-01,INT-08,63,89,1.0,0,Ambulance Bay to Emergency / A&E Road
+R-037,GATE-01,INT-01,96,162,1.3,0,Ambulance Bay to OPD Reception Road
+R-038,INT-01,INT-02,43,103,1.0,0,OPD Reception to Records Office Road
+R-039,INT-01,INT-03,113,34,1.0,0,OPD Reception to Triage Bay Road
+R-040,INT-01,INT-04,44,28,1.3,0,OPD Reception to Consulting Room A Road
+R-041,INT-03,INT-08,118,100,1.0,0,Triage Bay to Emergency / A&E Road
+R-042,INT-03,INT-05,66,88,1.3,0,Triage Bay to Consulting Room B Road
+R-043,INT-04,INT-05,23,74,1.0,0,Consulting Room A to Consulting Room B Road
+R-044,INT-05,INT-06,87,100,1.0,0,Consulting Room B to Consulting Room C Road
+R-045,INT-06,INT-07,42,147,1.0,0,Consulting Room C to Consulting Room D Road
+R-046,INT-08,INT-14,65,137,1.6,0,Emergency / A&E to Theatre 1 Road
+R-047,INT-08,INT-09,33,87,1.3,0,Emergency / A&E to Male Ward Road
+R-048,INT-08,INT-10,32,83,1.3,0,Emergency / A&E to Female Ward Road
+R-049,INT-08,INT-22,110,163,1.6,0,Emergency / A&E to Blood Bank Road
+R-050,INT-09,INT-10,83,87,1.0,0,Male Ward to Female Ward Road
+R-051,INT-10,INT-11,110,169,1.0,0,Female Ward to Paediatric Ward Road
+R-052,INT-11,INT-12,69,169,1.0,0,Paediatric Ward to Maternity Ward Road
+R-053,INT-12,INT-13,66,112,1.0,0,Maternity Ward to Lying-in Ward Road
+R-054,INT-14,INT-15,43,55,1.0,0,Theatre 1 to Theatre 2 Road
+R-055,INT-15,INT-16,80,146,1.0,0,Theatre 2 to Recovery Room Road
+R-056,INT-14,INT-23,26,32,2.0,0,Theatre 1 to Central Sterile Supply (CSSD) Road
+R-057,INT-15,INT-23,29,59,2.0,0,Theatre 2 to Central Sterile Supply (CSSD) Road
+R-058,INT-17,INT-18,95,60,1.0,0,Laboratory to Imaging / X-Ray Road
+R-059,INT-18,INT-19,116,128,1.0,0,Imaging / X-Ray to Ultrasound Unit Road
+R-060,INT-09,INT-17,91,36,1.3,0,Male Ward to Laboratory Road
+R-061,INT-10,INT-17,64,117,1.3,0,Female Ward to Laboratory Road
+R-062,INT-11,INT-17,91,139,1.3,0,Paediatric Ward to Laboratory Road
+R-063,INT-12,INT-17,82,84,1.3,0,Maternity Ward to Laboratory Road
+R-064,INT-13,INT-17,85,22,1.3,0,Lying-in Ward to Laboratory Road
+R-065,INT-20,INT-21,102,49,1.0,0,Pharmacy to Drug Store Road
+R-066,INT-21,INT-09,102,157,1.3,0,Drug Store to Male Ward Road
+R-067,INT-21,INT-10,111,88,1.3,0,Drug Store to Female Ward Road
+R-068,INT-21,INT-11,113,107,1.3,0,Drug Store to Paediatric Ward Road
+R-069,INT-21,INT-12,29,95,1.3,0,Drug Store to Maternity Ward Road
+R-070,INT-21,INT-13,70,60,1.3,0,Drug Store to Lying-in Ward Road
+R-071,INT-22,INT-14,73,20,1.6,0,Blood Bank to Theatre 1 Road
+R-072,INT-22,INT-15,107,87,1.6,0,Blood Bank to Theatre 2 Road
+R-073,INT-22,INT-12,79,65,1.3,0,Blood Bank to Maternity Ward Road
+R-074,INT-24,INT-09,79,47,3.0,0,Mortuary to Male Ward Road
+R-075,INT-24,INT-10,95,96,3.0,0,Mortuary to Female Ward Road
+R-076,INT-24,INT-08,96,149,1.6,0,Mortuary to Emergency / A&E Road
+R-077,INT-25,INT-26,92,70,1.0,0,Kitchen to Laundry Road
+R-078,INT-25,INT-09,34,115,1.0,0,Kitchen to Male Ward Road
+R-079,INT-25,INT-10,112,61,1.0,0,Kitchen to Female Ward Road
+R-080,INT-25,INT-11,84,155,1.0,0,Kitchen to Paediatric Ward Road
+R-081,INT-25,INT-12,15,173,1.0,0,Kitchen to Maternity Ward Road
+R-082,INT-25,INT-13,56,145,1.0,0,Kitchen to Lying-in Ward Road
+R-083,INT-26,INT-09,17,48,1.0,0,Laundry to Male Ward Road
+R-084,INT-26,INT-10,61,98,1.0,0,Laundry to Female Ward Road
+R-085,INT-26,INT-11,45,34,1.0,0,Laundry to Paediatric Ward Road
+R-086,INT-26,INT-12,45,165,1.0,0,Laundry to Maternity Ward Road
+R-087,INT-26,INT-13,25,41,1.0,0,Laundry to Lying-in Ward Road
+R-088,INT-27,INT-14,108,144,1.3,0,Biomedical Workshop to Theatre 1 Road
+R-089,INT-27,INT-17,119,37,1.3,0,Biomedical Workshop to Laboratory Road
+R-090,INT-27,INT-18,112,156,1.3,0,Biomedical Workshop to Imaging / X-Ray Road
+R-091,INT-28,INT-20,113,52,1.0,0,General Stores to Pharmacy Road
+R-092,INT-28,INT-23,31,141,1.0,0,General Stores to Central Sterile Supply (CSSD) Road
+R-093,INT-29,INT-30,85,62,1.0,0,Admin Block to Staff Room Road
+R-094,INT-29,INT-01,48,155,1.0,0,Admin Block to OPD Reception Road
+R-095,INT-29,INT-02,92,128,1.0,0,Admin Block to Records Office Road
+R-096,INT-02,INT-30,19,93,1.0,0,Records Office to Staff Room Road
+R-097,INT-06,INT-08,104,56,1.3,0,Consulting Room C to Emergency / A&E Road
+R-098,INT-14,INT-08,74,114,1.6,0,Theatre 1 to Emergency / A&E Road
+R-099,INT-20,INT-08,100,44,1.3,0,Pharmacy to Emergency / A&E Road
+R-100,INT-23,INT-08,73,173,1.6,0,Central Sterile Supply (CSSD) to Emergency / A&E Road

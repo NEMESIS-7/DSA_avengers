@@ -1,7 +1,6 @@
 package gsoo.structures;
 
-// ================================================================
-// A3 — Stack (custom, array-based, built from scratch)
+// Stack (custom-built, array-based, resizing (auto-doubling-size) built from scratch)
 //
 // No java.util.Stack, no java.util.ArrayList — just a plain Java
 // array that we manage and resize ourselves.
@@ -9,7 +8,7 @@ package gsoo.structures;
 // Used by: audit_events / undo-dispatch. Every time something
 // happens to a service request, we push an AuditEvent. To "undo"
 // the last action, we pop it off.
-// ================================================================
+
 
 public class Stack<T> {
 
@@ -23,7 +22,7 @@ public class Stack<T> {
         size = 0;
     }
 
-    // ---------------- Core operations ----------------
+    // The Core operations
 
     public void push(T item) {
         if (item == null) {
@@ -46,7 +45,7 @@ public class Stack<T> {
         return item;
     }
 
-    // Look at the top item WITHOUT removing it
+    // Look at the top item WITHOUT removing it ....
     public T peek() {
         if (isEmpty()) {
             throw new IllegalStateException("Cannot peek an empty stack");
@@ -62,7 +61,7 @@ public class Stack<T> {
         return size;
     }
 
-    // ---------------- Internal resizing ----------------
+    //Internal resizing
 
     @SuppressWarnings("unchecked")
     private void resize(int newCapacity) {
@@ -73,11 +72,11 @@ public class Stack<T> {
         data = newData;
     }
 
-    // ---------------- Quick manual test (run this file directly) ----------------
+    //  quick manual test
     public static void main(String[] args) {
         Stack<String> s = new Stack<>();
 
-        // NORMAL CASE: push a few, pop them back in reverse order
+        // 1. NORMAL CASE: push a few, pop them back in reverse order
         s.push("A");
         s.push("B");
         s.push("C");
@@ -86,14 +85,14 @@ public class Stack<T> {
         System.out.println("  " + s.pop());
         System.out.println("  " + s.pop());
 
-        // BOUNDARY CASE: push exactly enough to force a resize (default capacity is 8)
+        // 2. BOUNDARY CASE: push exactly enough to force a resize (default capacity is 8)
         Stack<Integer> s2 = new Stack<>();
-        for (int i = 1; i <= 9; i++) s2.push(i);   // 9th push triggers a resize
+        for (int i = 1; i <= 9; i++) s2.push(i);   // the 9th push triggers a resize(doubling)
         System.out.println("\nBoundary case — pushed 9 items past default capacity of 8:");
         System.out.println("  size() = " + s2.size() + " (expect 9)");
         System.out.println("  peek() = " + s2.peek() + " (expect 9)");
 
-        // INVALID CASE: popping an empty stack should throw, not crash silently
+        // 3. INVALID CASE: popping an empty stack should throw, not crash silently
         Stack<Integer> s3 = new Stack<>();
         System.out.println("\nInvalid case — pop on empty stack:");
         try {

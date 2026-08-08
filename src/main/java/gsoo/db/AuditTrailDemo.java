@@ -3,8 +3,8 @@ package gsoo.db;
 import gsoo.structures.Stack;
 import java.sql.*;
 
-// ================================================================
-// A3 — demonstrates the real job of the Stack: undo-dispatch.
+
+// This demonstrates the real job of the Stack: undo-dispatch.
 //
 // Flow:
 //   1. Simulate a couple of real actions happening to a real
@@ -15,7 +15,7 @@ import java.sql.*;
 //        - log the reversal itself as a new UNDONE audit event
 //          (audit trails are append-only — we never delete history,
 //           we log the correction as a new entry)
-// ================================================================
+
 
 public class AuditTrailDemo {
 
@@ -24,13 +24,13 @@ public class AuditTrailDemo {
 
             String requestId = "REQ-0001";
 
-            // --- Show the real current status before we touch anything ---
+            // Show the real current status before we touch anything
             String currentStatus = getStatus(conn, requestId);
             System.out.println("Before: " + requestId + " status = " + currentStatus);
 
             Stack<AuditEvent> auditStack = new Stack<>();
 
-            // --- Simulate two real actions happening, pushing + persisting each ---
+            //Simulate two real actions happening, pushing + persisting each
             AuditEvent created = new AuditEvent(requestId, "CREATED", null, "PENDING",
                     "A3-demo", new Timestamp(System.currentTimeMillis()));
             doAction(conn, auditStack, created);
@@ -42,7 +42,7 @@ public class AuditTrailDemo {
             System.out.println("\nAfter two actions: " + requestId + " status = " + getStatus(conn, requestId));
             System.out.println("Stack size = " + auditStack.size() + " (expect 2)");
 
-            // --- Now UNDO the most recent action ---
+            //Now UNDO the most recent action
             System.out.println("\n--- Undoing last action ---");
             undoLast(conn, auditStack, requestId);
 

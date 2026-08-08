@@ -1,8 +1,7 @@
 package gsoo.structures;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-
-// The three required tests for A3's Stack: normal, boundary, invalid.
+// The three required tests for my (A3) Stack: normal, boundary, invalid.
 // These count toward the team's 40-test floor — the main() demo in
 // Stack.java does NOT, since it's not a real JUnit test.
 public class StackTest {

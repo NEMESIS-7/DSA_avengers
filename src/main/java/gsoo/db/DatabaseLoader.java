@@ -25,15 +25,16 @@ class Location {
 }
 
 class Road {
-    String roadId, fromLocationId, toLocationId;
+    String roadId, fromLocationId, toLocationId, roadName;
     double distanceM, travelTimeS, roadConditionWeight;
     boolean isClosed;
 
-    Road(String roadId, String fromLocationId, String toLocationId,
+    Road(String roadId, String fromLocationId, String toLocationId, String roadName,
          double distanceM, double travelTimeS, double roadConditionWeight, boolean isClosed) {
         this.roadId = roadId;
         this.fromLocationId = fromLocationId;
         this.toLocationId = toLocationId;
+        this.roadName = roadName;
         this.distanceM = distanceM;
         this.travelTimeS = travelTimeS;
         this.roadConditionWeight = roadConditionWeight;
@@ -46,8 +47,8 @@ class Road {
     }
 
     public String toString() {
-        return roadId + " | " + fromLocationId + " -> " + toLocationId +
-               " | cost=" + effectiveCost() + (isClosed ? " [CLOSED]" : "");
+        return roadId + " | " + roadName + " | " + fromLocationId + " -> " + toLocationId +
+                " | cost=" + String.format("%.2f", effectiveCost()) + (isClosed ? " [CLOSED]" : "");
     }
 }
 
@@ -71,15 +72,16 @@ class Resource {
 }
 
 class ServiceRequest {
-    String requestId, category, sourceLocationId, destinationLocationId, status;
+    String requestId, category, patientRef, sourceLocationId, destinationLocationId, status;
     int urgency;
     Timestamp submittedAt, deadlineAt;
     String assignedResourceId;   // may be null
 
-    ServiceRequest(String requestId, String category, String sourceLocationId, String destinationLocationId,
+    ServiceRequest(String requestId, String category, String patientRef, String sourceLocationId, String destinationLocationId,
                    int urgency, String status, Timestamp submittedAt, Timestamp deadlineAt, String assignedResourceId) {
         this.requestId = requestId;
         this.category = category;
+        this.patientRef = patientRef;   // null for non-patient-specific categories
         this.sourceLocationId = sourceLocationId;
         this.destinationLocationId = destinationLocationId;
         this.urgency = urgency;
@@ -90,7 +92,8 @@ class ServiceRequest {
     }
 
     public String toString() {
-        return requestId + " | " + category + " | " + sourceLocationId + "->" + destinationLocationId +
+        return requestId + " | " + category + " | patient=" + (patientRef != null ? patientRef : "-") +
+               " | " + sourceLocationId + "->" + destinationLocationId +
                " | urgency=" + urgency + " | " + status;
     }
 }
@@ -99,9 +102,12 @@ class ServiceRequest {
 
 public class DatabaseLoader {
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
+    // Reads from an environment variable rather than hardcoding a real password
+    // in source control. Set it locally before running, e.g.:
+    //   export DB_PASSWORD=your_actual_password
+    private static final String URL      = "jdbc:postgresql://localhost:5432/postgres";
     private static final String USER     = "postgres";
-    private static final String PASSWORD = "h@tvEx120";
+    private static final String PASSWORD = System.getenv("DB_PASSWORD");
 
     public static Connection connect() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
@@ -150,7 +156,7 @@ public class DatabaseLoader {
         int n = countRows(conn, "roads");
         Road[] roads = new Road[n];
 
-        String sql = "SELECT road_id, from_location_id, to_location_id, distance_m, " +
+        String sql = "SELECT road_id, from_location_id, to_location_id, road_name, distance_m, " +
                      "travel_time_s, road_condition_weight, is_closed FROM roads";
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -160,6 +166,7 @@ public class DatabaseLoader {
                     rs.getString("road_id"),
                     rs.getString("from_location_id"),
                     rs.getString("to_location_id"),
+                    rs.getString("road_name"),
                     rs.getDouble("distance_m"),
                     rs.getDouble("travel_time_s"),
                     rs.getDouble("road_condition_weight"),
@@ -195,7 +202,7 @@ public class DatabaseLoader {
         int n = countRows(conn, "service_requests");
         ServiceRequest[] requests = new ServiceRequest[n];
 
-        String sql = "SELECT request_id, category, source_location_id, destination_location_id, " +
+        String sql = "SELECT request_id, category, patient_ref, source_location_id, destination_location_id, " +
                      "urgency, status, submitted_at, deadline_at, assigned_resource_id FROM service_requests";
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -204,6 +211,7 @@ public class DatabaseLoader {
                 requests[i++] = new ServiceRequest(
                     rs.getString("request_id"),
                     rs.getString("category"),
+                    rs.getString("patient_ref"),   // null-safe automatically for non-patient categories
                     rs.getString("source_location_id"),
                     rs.getString("destination_location_id"),
                     rs.getInt("urgency"),

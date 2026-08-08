@@ -3,11 +3,11 @@ package gsoo.db;
 import java.sql.Timestamp;
 
 // Mirrors the audit_events table exactly. eventId is null until the
-// database assigns it (it's a SERIAL column — Postgres auto-generates it).
+// database assigns it (it's a SERIAL column — Postgres automatically generates  it).
 public class AuditEvent {
     Integer eventId;           // null until inserted (DB assigns this)
     String requestId;
-    String action;             // e.g. CREATED, ASSIGNED, STATUS_CHANGE, UNDONE
+    String action;             // for example:  CREATED, ASSIGNED, STATUS_CHANGE, UNDONE
     String previousStatus;
     String newStatus;
     String performedBy;
