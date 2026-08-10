@@ -2,96 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>gsoo</groupId>
-  <artifactId>gsoo-project</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+    <groupId>org.reynolds</groupId>
+    <artifactId>DSA_avengers</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
-  <name>Ghana Smart Service Operations Optimizer</name>
-  <description>DCIT 204/308 Joint DSA Semester Project — district hospital operations context</description>
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-  <properties>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <junit.version>5.10.2</junit.version>
-    <!--
-      Database driver: PostgreSQL, per team decision (checklist cover sheet confirms this).
-      Unlike SQLite, this means every teammate — and the examiner — needs a reachable
-      Postgres instance (local install or a shared/hosted one) with connection details
-      supplied via config, not a single self-contained file. See README "Build & run"
-      for connection setup; consider a docker-compose.yml so "docker compose up" gives
-      everyone (including the examiner) an identical local Postgres with zero manual setup.
-    -->
-    <postgresql.version>42.7.3</postgresql.version>
-  </properties>
-
-  <dependencies>
-    <!-- Testing: JUnit 5 -->
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- Database driver -->
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${postgresql.version}</version>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <finalName>gsoo</finalName>
-    <plugins>
-      <!-- Compiler -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
-        <configuration>
-          <release>21</release>
-        </configuration>
-      </plugin>
-
-      <!-- Test runner -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.2.5</version>
-      </plugin>
-
-      <!--
-        Shade plugin: produces one runnable fat jar (gsoo.jar) bundling the JDBC
-        driver, so the examiner can run `java -jar gsoo.jar` with no separate
-        classpath setup. Required by the console-menu / live-demo constraint
-        in the brief (Section 8: examiner runs demonstrations without editing source).
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.3</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <!-- Update once A1 creates the console entry point -->
-                  <mainClass>gsoo.app.Main</mainClass>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

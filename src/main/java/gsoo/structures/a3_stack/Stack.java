@@ -1,4 +1,4 @@
-package gsoo.structures;
+package gsoo.structures.a3_stack;
 
 // Stack (custom-built, array-based, resizing (auto-doubling-size) built from scratch)
 //

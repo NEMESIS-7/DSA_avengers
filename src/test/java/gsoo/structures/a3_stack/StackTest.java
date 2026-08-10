@@ -1,4 +1,4 @@
-package gsoo.structures;
+package gsoo.structures.a3_stack;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 // The three required tests for my (A3) Stack: normal, boundary, invalid.

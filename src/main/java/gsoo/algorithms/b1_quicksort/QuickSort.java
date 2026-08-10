@@ -1,3 +1,5 @@
+package gsoo.algorithms.b1_quicksort;
+
 public class QuickSort {
 
     public static void quickSort(int[] arr, int low, int high) {

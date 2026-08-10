@@ -1,6 +1,6 @@
 package gsoo.db;
 
-import gsoo.structures.Stack;
+import gsoo.structures.a3_stack.Stack;
 import java.sql.*;
 
 
