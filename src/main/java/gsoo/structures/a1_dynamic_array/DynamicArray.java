@@ -1,28 +1,5 @@
-package com.reynolds.dsa.linear.array;
+package gsoo.structures.a1_dynamic_array;
 
-/**
- * A dynamic array backed by a plain Object[].
- * <p>
- * THE CONTRACT — implement all of these:
- * add(item)          — append to end. O(?) amortized — why?
- * get(index)         — O(?)
- * set(index, item)   — O(?)
- * removeAt(index)    — O(?) — what has to happen to the elements after index?
- * size()             — O(?)
- * isEmpty()          — O(?)
- * <p>
- * RULES:
- * - No java.util imports. The whole point is building it yourself.
- * - Start with capacity 10. When full, grow. Decide your growth factor
- * and be able to defend it (what does ArrayList use? why?).
- * - Out-of-bounds access must throw IndexOutOfBoundsException.
- * - Write the complexity + WHY as a comment above every method.
- * <p>
- * WHEN DONE:
- * - Open the JDK's ArrayList source (Ctrl+click in IntelliJ).
- * Find three things it does that yours doesn't. Write them at the
- * bottom of this file as comments.
- */
 public class DynamicArray<T> {
 
     private Object[] data = new Object[10];

@@ -4,7 +4,7 @@ import java.sql.*;
 
 
 
-class Location {
+/*class Location {
     String locationId, name, layer, type, area;
     Double latitude, longitude;   // Double (not double) so a NULL can be represented as null
 
@@ -96,7 +96,7 @@ class ServiceRequest {
                " | " + sourceLocationId + "->" + destinationLocationId +
                " | urgency=" + urgency + " | " + status;
     }
-}
+}*/
 
 // ---------------- The loader itself ----------------
 

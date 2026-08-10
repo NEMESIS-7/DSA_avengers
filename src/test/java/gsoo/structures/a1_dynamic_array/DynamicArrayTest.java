@@ -1,4 +1,4 @@
-package com.reynolds.dsa.linear.array;
+package gsoo.structures.a1_dynamic_array;
 
 import org.junit.jupiter.api.Test;
 
