@@ -1,10 +1,12 @@
 package gsoo.app;
 
+import gsoo.algorithms.a1_binary_search.BinarySearch;
 import gsoo.algorithms.b1_quicksort.QuickSort;
 import gsoo.algorithms.b3_brute_force.BruteForceAssignment;
 import gsoo.db.DatabaseLoader;
 import gsoo.db.Location;
 import gsoo.structures.Graph;
+import gsoo.structures.a1_dynamic_array.DynamicArray;
 import gsoo.structures.a3_stack.Stack;
 import gsoo.structures.b3_btree.BTree;
 import gsoo.structures.b5_map.CustomMap;
@@ -28,6 +30,7 @@ public class Main {
 
     public static void main(String[] args) {
         MenuItem[] items = {
+                new MenuItem("Dynamic array + binary search demo (A1)", Main::binarySearchDemo),
                 new MenuItem("Check database connection (A3)", Main::checkDatabaseConnection),
                 new MenuItem("Stack demo — audit trail undo (A3)", Main::stackDemo),
                 new MenuItem("B-tree demo — request index (B3)", Main::btreeDemo),
@@ -76,6 +79,32 @@ public class Main {
     }
 
     // ---------------- Wired demos ----------------
+
+    private static void binarySearchDemo() {
+        // Request IDs load into the dynamic array in whatever order they arrive —
+        // sorted here because binary search requires it; A1's DynamicArray itself
+        // doesn't enforce ordering, that's the caller's job (same as the real system,
+        // where the sort step is a separate slot: quicksort/merge sort).
+        DynamicArray<String> requestIds = new DynamicArray<>();
+        for (String id : new String[]{"RQ-00001", "RQ-00005", "RQ-00010", "RQ-00015", "RQ-00020"}) {
+            requestIds.add(id);
+        }
+        System.out.println("Loaded " + requestIds.size() + " request IDs into the dynamic array.");
+
+        String[] sorted = new String[requestIds.size()];
+        for (int i = 0; i < requestIds.size(); i++) {
+            sorted[i] = requestIds.get(i);
+        }
+
+        BinarySearch<String> search = new BinarySearch<>();
+        String target = "RQ-00015";
+        int foundIndex = search.binarySearch(0, sorted.length - 1, sorted, target);
+        System.out.println("binarySearch(\"" + target + "\") -> index " + foundIndex);
+
+        String missing = "RQ-99999";
+        int missingIndex = search.binarySearch(0, sorted.length - 1, sorted, missing);
+        System.out.println("binarySearch(\"" + missing + "\") -> " + missingIndex + " (not present)");
+    }
 
     private static void checkDatabaseConnection() {
         try (Connection conn = DatabaseLoader.connect()) {

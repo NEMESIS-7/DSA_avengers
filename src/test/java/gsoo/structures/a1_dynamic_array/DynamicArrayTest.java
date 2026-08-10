@@ -4,15 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests that try to BREAK the structure, not confirm it works.
- * One example given — the rest are yours. Minimum:
- * - empty array: get(0) throws, isEmpty() true, size() 0
- * - single element: add then removeAt(0) leaves it empty
- * - force a resize: add 1000 elements, verify all 1000 survive
- * - removeAt(middle): elements after it shift left correctly
- * - negative index: throws
- */
 class DynamicArrayTest {
 
     @Test
@@ -25,6 +16,14 @@ class DynamicArrayTest {
     void verifyIsEmpty() {
         DynamicArray<String> data = new DynamicArray<>(0);
         assertTrue(data.isEmpty());
+    }
+
+    @Test
+    void verifyAddGrowsFromZeroCapacity() {
+        DynamicArray<String> data = new DynamicArray<>(0);
+        data.add("first");
+        assertEquals(1, data.size());
+        assertEquals("first", data.get(0));
     }
 
     @Test
