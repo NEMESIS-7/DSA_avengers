@@ -11,8 +11,8 @@ public class DatabaseLoader {
     // Reads from an environment variable rather than hardcoding a real password
     // in source control. Set it locally before running, e.g.:
     //   export DB_PASSWORD=your_actual_password
-    private static final String URL      = "jdbc:postgresql://localhost:5432/postgres";
-    private static final String USER     = "postgres";
+    private static final String URL      = System.getenv("DB_URL");
+    private static final String USER     = System.getenv("DB_USER");
     private static final String PASSWORD = System.getenv("DB_PASSWORD");
 
     public static Connection connect() throws SQLException {
@@ -129,6 +129,33 @@ public class DatabaseLoader {
             }
         }
         return requests;
+    }
+
+    // ---------------- Writes (mirrors AuditTrailDemo's private helpers, made
+    // reusable so gsoo.app can persist through this class rather than reaching
+    // into DB internals directly) ----------------
+
+    public static void insertAuditEvent(Connection conn, AuditEvent event) throws SQLException {
+        String sql = "INSERT INTO audit_events (request_id, action, previous_status, new_status, performed_by, event_time) " +
+                     "VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, event.requestId);
+            ps.setString(2, event.action);
+            ps.setString(3, event.previousStatus);
+            ps.setString(4, event.newStatus);
+            ps.setString(5, event.performedBy);
+            ps.setTimestamp(6, event.eventTime);
+            ps.executeUpdate();
+        }
+    }
+
+    public static void updateRequestStatus(Connection conn, String requestId, String newStatus) throws SQLException {
+        String sql = "UPDATE service_requests SET status = ? WHERE request_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setString(2, requestId);
+            ps.executeUpdate();
+        }
     }
 
     // ---------------- Demo / sanity check ----------------
