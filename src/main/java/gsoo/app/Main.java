@@ -9,6 +9,8 @@ import gsoo.db.Resource;
 import gsoo.db.ServiceRequest;
 import gsoo.structures.Graph;
 import gsoo.structures.a3_stack.Stack;
+import gsoo.structures.a4_queue_circular_queue.CircularQueue;
+import gsoo.structures.a4_queue_circular_queue.DynamicQueue;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -20,8 +22,15 @@ import java.util.Scanner;
  * mainClass. Chapters share one loaded {@link Session} (backed by a live
  * Postgres connection, held open for the run) instead of each building its
  * own disposable toy data, so this reads as one request's walk through the
- * system rather than 8 unrelated demos. Load the dataset first (option 1);
- * everything else operates on that same real, live data.
+ * system rather than unrelated demos.
+ *
+ * Navigation is two-level: a top menu (load / run the full story / explore
+ * chapters by pod / quit), and an explore submenu grouped by pod using short
+ * mnemonic codes (a1, b3b, c4, ...) instead of raw numbers, so the menu reads
+ * as "which pod's work do you want to see" rather than an insertion-ordered
+ * list. {@link #CHAPTERS} is the single source of truth for both the story
+ * order (array order) and the pod grouping (each chapter's {@code pod} tag) —
+ * adding a chapter for a newly-merged slot is one array entry, not a rewrite.
  *
  * Only as true a story as what's actually merged: no priority queue,
  * routing, or dispatch algorithm exists yet (C1/C2/C5), so the walkthrough
@@ -30,64 +39,134 @@ import java.util.Scanner;
  */
 public class Main {
 
-    private record MenuItem(String label, Runnable action) {
+    private record Chapter(String code, String pod, String label, Runnable action) {
     }
+
+    private static final Chapter[] CHAPTERS = {
+            new Chapter("a1", "A", "Find today's focus request — binary search", Main::findFocusRequest),
+            new Chapter("a3", "A", "Walk its audit trail — writes to the live DB", Main::auditTrailChapter),
+            new Chapter("a4a", "A", "Walk-in line — FIFO queue", Main::opdQueueChapter),
+            new Chapter("a4b", "A", "Porter roster wraps — circular queue", Main::porterRosterChapter),
+            new Chapter("b5", "B", "Look up its category volume", Main::categoryVolumeChapter),
+            new Chapter("b3a", "B", "Confirm it in the request index (B-tree)", Main::requestIndexChapter),
+            new Chapter("c4", "C", "Look at its location's road connections", Main::graphChapter),
+            new Chapter("b1", "B", "Sort today's queue by urgency (quicksort)", Main::quickSortChapter),
+            new Chapter("b3b", "B", "Brute-force assign 3 porters to 3 jobs", Main::bruteForceChapter),
+    };
 
     private static final Session session = new Session();
 
     public static void main(String[] args) {
-
-        MenuItem[] items = {
-                new MenuItem("Load the real dataset from the live database (start here)", Main::loadDataset),
-                new MenuItem("Find today's focus request — binary search (A1)", Main::findFocusRequest),
-                new MenuItem("Walk its audit trail — writes to the live DB (A3)", Main::auditTrailChapter),
-                new MenuItem("Look up its category volume (B5)", Main::categoryVolumeChapter),
-                new MenuItem("Confirm it in the request index (B3)", Main::requestIndexChapter),
-                new MenuItem("Look at its location's road connections (C4)", Main::graphChapter),
-                new MenuItem("Sort today's queue by urgency (B1)", Main::quickSortChapter),
-                new MenuItem("Brute-force assign 3 porters to 3 jobs (B3)", Main::bruteForceChapter),
-        };
-
         Scanner scanner = new Scanner(System.in);
-        while (true) {
-            printMenu(items);
+        boolean quit = false;
+        while (!quit) {
+            printTopMenu();
             String input = scanner.nextLine().trim();
-            if (input.equalsIgnoreCase("q")) {
-                System.out.println("Goodbye.");
-                break;
+            switch (input.toLowerCase()) {
+                case "q" -> quit = true;
+                case "1" -> {
+                    System.out.println();
+                    loadDataset();
+                    System.out.println();
+                }
+                case "2" -> runFullStory();
+                case "3" -> quit = exploreByPod(scanner);
+                default -> System.out.println("No such option.");
             }
-
-            int choice;
-            try {
-                choice = Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                System.out.println("Enter a number, or 'q' to quit.");
-                continue;
-            }
-            if (choice < 1 || choice > items.length) {
-                System.out.println("No such option.");
-                continue;
-            }
-
-            System.out.println();
-            items[choice - 1].action().run();
-            System.out.println();
         }
+        System.out.println("Goodbye.");
         scanner.close();
         session.close();
     }
 
-    private static void printMenu(MenuItem[] items) {
+    private static void printTopMenu() {
         System.out.println("=== Ghana Smart Service Operations Optimizer ===");
-        System.out.println("(" + (items.length - 1) + " of 15 slots wired into the walkthrough so far)");
         System.out.println(session.loaded
                 ? "Dataset loaded from the live DB. Focus request: " + session.focusRequest.requestId
-                : "Dataset not loaded yet — run option 1 first.");
-        for (int i = 0; i < items.length; i++) {
-            System.out.println("  " + (i + 1) + ". " + items[i].label());
-        }
+                : "Dataset not loaded yet — start with option 1.");
+        System.out.println("  1. Load the real dataset");
+        System.out.println("  2. Run the full story, start to finish");
+        System.out.println("  3. Explore chapters by pod (" + CHAPTERS.length + " of 15 slots wired in so far)");
         System.out.println("  q. Quit");
         System.out.print("> ");
+    }
+
+    private static void runFullStory() {
+        System.out.println();
+        if (!session.loaded) {
+            System.out.println("Loading the dataset first...");
+            loadDataset();
+            System.out.println();
+        }
+        for (Chapter c : CHAPTERS) {
+            System.out.println("--- [" + c.pod() + "] " + c.label() + " ---");
+            c.action().run();
+            System.out.println();
+        }
+    }
+
+    /** Returns true if the user asked to quit the whole app from inside this submenu. */
+    private static boolean exploreByPod(Scanner scanner) {
+        while (true) {
+            printPodMenu();
+            String input = scanner.nextLine().trim().toLowerCase();
+            if (input.equals("q")) {
+                return true;
+            }
+            if (input.equals("b") || input.equals("back")) {
+                return false;
+            }
+            Chapter match = findByCode(input);
+            if (match == null) {
+                System.out.println("No such chapter code.");
+                continue;
+            }
+            System.out.println();
+            match.action().run();
+            System.out.println();
+        }
+    }
+
+    private static void printPodMenu() {
+        System.out.println();
+        String[] podsInFirstSeenOrder = distinctPodsInOrder();
+        for (String pod : podsInFirstSeenOrder) {
+            System.out.println("-- Pod " + pod + " --");
+            for (Chapter c : CHAPTERS) {
+                if (c.pod().equals(pod)) {
+                    System.out.println("  " + c.code() + ". " + c.label());
+                }
+            }
+        }
+        System.out.println("  b. Back    q. Quit");
+        System.out.print("> ");
+    }
+
+    private static String[] distinctPodsInOrder() {
+        String[] pods = new String[CHAPTERS.length];
+        int count = 0;
+        for (Chapter c : CHAPTERS) {
+            boolean seen = false;
+            for (int i = 0; i < count; i++) {
+                if (pods[i].equals(c.pod())) {
+                    seen = true;
+                    break;
+                }
+            }
+            if (!seen) {
+                pods[count++] = c.pod();
+            }
+        }
+        return Arrays.copyOf(pods, count);
+    }
+
+    private static Chapter findByCode(String code) {
+        for (Chapter c : CHAPTERS) {
+            if (c.code().equals(code)) {
+                return c;
+            }
+        }
+        return null;
     }
 
     private static boolean requireLoaded() {
@@ -218,6 +297,52 @@ public class Main {
                 + "aren't merged yet, so this chapter stops at direct connections.)");
     }
 
+    private static void opdQueueChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        ServiceRequest[] pending = allWithStatus(session.requests, "PENDING");
+        sortBySubmittedAt(pending);
+
+        DynamicQueue<ServiceRequest> walkInLine = new DynamicQueue<>();
+        for (ServiceRequest r : pending) {
+            walkInLine.enqueue(r);
+        }
+        System.out.println("Enqueued " + walkInLine.size() + " real PENDING requests in arrival order (FIFO).");
+
+        System.out.println("First 3 to be served in pure arrival order:");
+        for (int i = 0; i < 3 && !walkInLine.isEmpty(); i++) {
+            ServiceRequest r = walkInLine.dequeue();
+            String marker = r.requestId.equals(session.focusRequest.requestId) ? "  <- today's focus request" : "";
+            System.out.println("  " + r + marker);
+        }
+        System.out.println(walkInLine.size() + " remain in the line.");
+        System.out.println("(Pure FIFO ignores urgency entirely — that's exactly why C2's priority "
+                + "heap, not merged yet, is what the real dispatch queue needs instead of this.)");
+    }
+
+    private static void porterRosterChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        Resource[] porters = allOfType(session.resources, "porter");
+        CircularQueue<String> roster = new CircularQueue<>(porters.length);
+        for (Resource p : porters) {
+            roster.enqueue(p.resourceId);
+        }
+        System.out.println("Loaded " + roster.size() + " real porters into a capacity-"
+                + porters.length + " circular queue.");
+
+        System.out.println("Rotating the roster one full lap plus 2, to show it wraps instead of running out:");
+        for (int i = 0; i < porters.length + 2; i++) {
+            String onDeck = roster.dequeue();
+            roster.enqueue(onDeck); // back of the line after their turn
+            System.out.println("  turn " + (i + 1) + ": " + onDeck + " on deck");
+        }
+        System.out.println("Still holding all " + roster.size() + " porters (isFull()=" + roster.isFull()
+                + ") — nothing lost across the wrap.");
+    }
+
     private static void quickSortChapter() {
         if (!requireLoaded()) {
             return;
@@ -281,6 +406,52 @@ public class Main {
             }
         }
         return Arrays.copyOf(found, count);
+    }
+
+    private static ServiceRequest[] allWithStatus(ServiceRequest[] requests, String status) {
+        int count = 0;
+        for (ServiceRequest r : requests) {
+            if (status.equals(r.status)) {
+                count++;
+            }
+        }
+        ServiceRequest[] found = new ServiceRequest[count];
+        int i = 0;
+        for (ServiceRequest r : requests) {
+            if (status.equals(r.status)) {
+                found[i++] = r;
+            }
+        }
+        return found;
+    }
+
+    private static void sortBySubmittedAt(ServiceRequest[] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            ServiceRequest key = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j].submittedAt.compareTo(key.submittedAt) > 0) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+    }
+
+    private static Resource[] allOfType(Resource[] resources, String type) {
+        int count = 0;
+        for (Resource r : resources) {
+            if (r.type.equals(type)) {
+                count++;
+            }
+        }
+        Resource[] found = new Resource[count];
+        int i = 0;
+        for (Resource r : resources) {
+            if (r.type.equals(type)) {
+                found[i++] = r;
+            }
+        }
+        return found;
     }
 
     private static ServiceRequest[] firstNPending(ServiceRequest[] requests, int n) {
