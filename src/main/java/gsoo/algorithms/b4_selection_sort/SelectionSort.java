@@ -1,4 +1,4 @@
-package algorithms.b4_selection_sort;
+package gsoo.algorithms.b4_selection_sort;
 
 class ServiceRequest {
     String requestId;
