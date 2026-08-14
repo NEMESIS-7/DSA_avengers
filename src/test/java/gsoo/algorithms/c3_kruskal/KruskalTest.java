@@ -2,6 +2,8 @@ package gsoo.algorithms.c3_kruskal;
 
 import gsoo.structures.c4_graph_adjacency_list.AdjacencyListGraph;
 
+import gsoo.structures.Graph;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -144,6 +146,109 @@ public class KruskalTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> kruskal.run(null)
+        );
+    }
+
+    @Test
+    void shouldGenerateKruskalTraceEvidence() {
+
+        AdjacencyListGraph graph =
+                new AdjacencyListGraph();
+
+        graph.addNode("AMBULANCE-BAY", "gateway");
+        graph.addNode("OPD", "department");
+        graph.addNode("LAB", "department");
+        graph.addNode("PHARMACY", "department");
+
+        // Effective cost = travelTimeSecs * roadConditionWeight
+
+        graph.addEdge(
+                "AMBULANCE-BAY", "OPD",
+                50,
+                10,
+                1.0,
+                false
+        ); // cost = 10
+
+        graph.addEdge(
+                "OPD", "LAB",
+                40,
+                8,
+                1.0,
+                false
+        ); // cost = 8
+
+        graph.addEdge(
+                "LAB", "PHARMACY",
+                30,
+                5,
+                1.0,
+                false
+        ); // cost = 5
+
+        graph.addEdge(
+                "AMBULANCE-BAY", "LAB",
+                70,
+                15,
+                1.0,
+                false
+        ); // cost = 15
+
+        graph.addEdge(
+                "OPD", "PHARMACY",
+                60,
+                12,
+                1.0,
+                false
+        ); // cost = 12
+
+        Kruskal kruskal =
+                new Kruskal();
+
+        Kruskal.Result result =
+                kruskal.run(graph);
+
+        StringBuilder trace =
+                new StringBuilder();
+
+        trace.append("\n=== C3 KRUSKAL MST TRACE ===\n");
+        trace.append("Step | From | To | Effective Cost\n");
+        trace.append("--------------------------------\n");
+
+        for (int i = 0; i < result.mstEdges.length; i++) {
+
+            Graph.Edge edge =
+                    result.mstEdges[i];
+
+            double cost =
+                    edge.travelTimeSecs
+                            * edge.roadConditionWeight;
+
+            trace.append(i + 1)
+                    .append(" | ")
+                    .append(edge.fromId)
+                    .append(" | ")
+                    .append(edge.toId)
+                    .append(" | ")
+                    .append(cost)
+                    .append("\n");
+        }
+
+        trace.append("--------------------------------\n");
+
+        trace.append("Total MST Cost: ")
+                .append(result.totalCost)
+                .append("\n");
+
+        trace.append("Edges Selected: ")
+                .append(result.mstEdges.length)
+                .append("\n");
+
+        System.out.println(trace);
+
+        assertEquals(
+                graph.nodeCount() - 1,
+                result.mstEdges.length
         );
     }
 }
