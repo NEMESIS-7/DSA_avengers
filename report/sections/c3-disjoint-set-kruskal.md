@@ -33,29 +33,21 @@ This difference is important when interpreting the project's empirical results. 
 
 ## Trace walkthrough
 
-A demonstration trace was generated directly from the C3 test code using four hospital-network locations:
+The final Kruskal trace was generated directly from the project's real seed dataset.
 
-* `AMBULANCE-BAY`
-* `OPD`
-* `LAB`
-* `PHARMACY`
+The dataset contained 50 locations and 100 road records. Because the shared adjacency-list graph permits only one undirected edge between a pair of vertices, two parallel road records were collapsed by retaining the lower effective-cost alternative. This produced 98 unique usable graph edges.
 
-Kruskal selected the following edges in increasing effective-cost order:
+Kruskal selected 49 edges, which satisfies the spanning-tree property:
 
-| Step | From          | To       | Effective Cost |
-| ---- | ------------- | -------- | -------------: |
-| 1    | LAB           | PHARMACY |            5.0 |
-| 2    | OPD           | LAB      |            8.0 |
-| 3    | AMBULANCE-BAY | OPD      |           10.0 |
+`V - 1 = 50 - 1 = 49`
 
-The resulting total MST cost was:
+The resulting total effective MST cost was:
 
-`5.0 + 8.0 + 10.0 = 23.0`
+**16750.40**
 
-Three edges were selected for four vertices, satisfying the MST requirement of `V - 1 = 3`.
+The complete generated trace is stored in:
 
-This trace currently demonstrates that the trace mechanism works correctly. The final evidence version will be rerun against the team's full hospital dataset once the database/road seed data is available.
-
+`docs/evidence/c3-kruskal-trace.md`
 ## Tests and why
 
 The C3 slot currently includes tests for both the data structure and algorithm.
