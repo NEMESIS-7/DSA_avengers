@@ -1,24 +1,32 @@
-package structures.b4_hash_table;
+package gsoo.structures.b4_hash_table;
 
-//separate chaining was used. 
+import gsoo.db.ServiceRequest;
+import gsoo.app.Config;
+
+// Custom hash table implementation using separate chaining. where collisions are handled by linking entries together.
+
 public class HashTable {
 
     private HashEntry[] buckets; // the actual array of buckets
-    private int size;            
-    private int capacity;        
+    private int size;            // how many entries are currently stored
+    private int capacity;        // number of buckets
 
     // Load factor is entries / capacity. Once it goes above this,
     // we resize the table so lookups don't get slow.
     private static final double LOAD_FACTOR_LIMIT = 0.75;
 
+    public HashTable() {
+        this(Config.HASH_TABLE_SIZE);
+    }
+
+    // Still allow a custom capacity to be passed in, useful for testing
     public HashTable(int capacity) {
         this.capacity = capacity;
         this.buckets = new HashEntry[capacity];
         this.size = 0;
     }
 
-    // Simple hash function: sum up the character codes of the key,
-    // then mod by the number of buckets so it fits in the array.
+    //sum up the character codes of the key, then mod by the number of buckets so it fits in the array.
     private int hash(String key) {
         int sum = 0;
         for (int i = 0; i < key.length(); i++) {
@@ -108,8 +116,7 @@ public class HashTable {
         return false; // key was not found, nothing removed
     }
 
-    // Doubles the table size (roughly) and re-inserts every entry.This has to be done because changing capacity changes what
-    // hash(key) returns for every key.
+    // Doubles the table size (roughly) and re-inserts every entry. This has to be done because changing capacity changes what hash(key) returns for every key.
     private void resize() {
         HashEntry[] oldBuckets = buckets;
         capacity = capacity * 2;
