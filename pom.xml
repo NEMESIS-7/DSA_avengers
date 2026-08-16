@@ -29,7 +29,7 @@
   </properties>
 
   <dependencies>
-    <!-- Testing: JUnit 5. Scaffolding only — never used to implement banned built-ins. -->
+    <!-- Testing: JUnit 5 -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
