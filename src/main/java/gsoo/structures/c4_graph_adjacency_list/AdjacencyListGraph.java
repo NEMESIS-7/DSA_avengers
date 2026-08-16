@@ -2,7 +2,8 @@ package gsoo.structures.c4_graph_adjacency_list;
 
 import gsoo.structures.Graph;
 
-
+// Adjacency list graph. Node lookup is a linear scan (O(n)) since we're
+// not allowed to use HashMap - could be sped up later with B4's hash table.
 public class AdjacencyListGraph implements Graph {
 
     private static class NodeEntry {
@@ -74,7 +75,7 @@ public class AdjacencyListGraph implements Graph {
     @Override
     public void addEdge(String fromId, String toId,
                          double distanceMetres, double travelTimeSecs,
-                         double roadConditionWeight, boolean directed) {
+                         double roadConditionWeight, boolean directed, boolean isClosed) {
         int fromIndex = findNodeIndex(fromId);
         int toIndex = findNodeIndex(toId);
 
@@ -90,7 +91,7 @@ public class AdjacencyListGraph implements Graph {
         }
 
         Edge edge = new Edge(fromId, toId, distanceMetres, travelTimeSecs,
-                              roadConditionWeight, directed);
+                              roadConditionWeight, directed, isClosed);
 
         NodeEntry fromNode = nodes[fromIndex];
         growEdgesArrayIfNeeded(fromNode);
