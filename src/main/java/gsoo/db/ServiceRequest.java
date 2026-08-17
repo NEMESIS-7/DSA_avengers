@@ -8,7 +8,11 @@ public class ServiceRequest {
     public Timestamp submittedAt, deadlineAt;
     public String assignedResourceId;   // may be null
 
+<<<<<<< HEAD
     ServiceRequest(String requestId, String category, String patientRef, String sourceLocationId, String destinationLocationId,
+=======
+    public ServiceRequest(String requestId, String category, String patientRef, String sourceLocationId, String destinationLocationId,
+>>>>>>> 6402d570fdb7195621108a0df30be174bd14fe8f
                    int urgency, String status, Timestamp submittedAt, Timestamp deadlineAt, String assignedResourceId) {
         this.requestId = requestId;
         this.category = category;
