@@ -62,7 +62,7 @@ public class Session {
         for (Road road : roads) {
             if (!graph.hasEdge(road.fromLocationId, road.toLocationId)) {
                 graph.addEdge(road.fromLocationId, road.toLocationId,
-                        road.distanceM, road.travelTimeS, road.roadConditionWeight, false);
+                        road.distanceM, road.travelTimeS, road.roadConditionWeight, false, road.isClosed);
             }
         }
 
