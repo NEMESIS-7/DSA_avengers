@@ -1,5 +1,7 @@
 # A3 Trace Tables — Stack & Undo-Dispatch
 
+`Stack.java` and `StackTest.java` live at `src/main/java/gsoo/structures/a3_stack/` (package `gsoo.structures.a3_stack`), corrected from an earlier package mismatch during Week 2 integration.
+
 ## Table 1 — Array-level trace: `push()` and resize (boundary case)
 
 Traces `Stack.java`'s internal array exactly as `StackTest.boundaryCase_pushingPastDefaultCapacityTriggersResize()` exercises it: pushing 9 integers into a stack that starts at `DEFAULT_CAPACITY = 8`.
@@ -16,13 +18,13 @@ Traces `Stack.java`'s internal array exactly as `StackTest.boundaryCase_pushingP
 | 8 | `push(8)` | 7 | 8 | No | `[1,2,3,4,5,6,7,8]` | 8 |
 | 9 | `push(9)` | 8 | 8 | **Yes** — `resize(16)` copies all 8 existing elements into a new 16-slot array, *then* `9` is written to index 8 | `[1,2,3,4,5,6,7,8,9]` (capacity now 16, 7 unused trailing slots) | 9 |
 
-**Result:** `size() = 9`, `peek() = 9` — matches the test's expected values. The resize is triggered by the *last* push, not a push before it — worth being precise about that if asked, since `size == data.length` is checked *before* the write, not after.
+**Result:** `size() = 9`, `peek() = 9` — matches the test's expected values. The resize is triggered by the *last* push, not a push before it.
 
 ---
 
 ## Table 2 — Functional trace: undo-dispatch on REQ-0001 (real seed data)
 
-Traces `AuditTrailDemo.main()` end to end. REQ-0001's real seeded status is `COMPLETED` — the demo overwrites this regardless, which is the caveat noted above.
+Traces `AuditTrailDemo.main()` end to end. REQ-0001's real seeded status is `COMPLETED` — the demo overwrites this regardless, which is a known caveat of running the demo against real seed data. REQ-0001 is a `REFERRAL_IN` request and also carries a real `patient_ref` (`PAT-0011`) in the current dataset — not touched by this demo, since the undo-dispatch flow only reads/writes `status`, but worth knowing it's there if asked.
 
 | Step | Line(s) in code | Action | `auditStack` (bottom→top) | New `audit_events` row | `service_requests.status` |
 |------|------------------|--------|----------------------------|--------------------------|------------------------------|
