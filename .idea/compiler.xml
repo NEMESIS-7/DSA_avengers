@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
@@ -13,4 +14,18 @@
       <module name="gsoo-project" target="21" />
     </bytecodeTargetLevel>
   </component>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="gsoo-project" />
+      </profile>
+    </annotationProcessing>
+  </component>
+>>>>>>> 4ace3978dbcc86afb99ae96ae9d03bdbb3e24c22
 </project>
