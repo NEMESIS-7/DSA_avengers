@@ -3,7 +3,6 @@ package gsoo.algorithms.c4_prim;
 import gsoo.structures.Graph;
 import gsoo.structures.Graph.Edge;
 
-
 public class PrimMST {
 
     public static class MSTResult {
@@ -18,8 +17,7 @@ public class PrimMST {
         }
     }
 
-    // TODO: switch to gsoo.app.Config once it exists, so this matches the
-    // one project-wide cost formula instead of duplicating it here.
+    // TODO: switch to gsoo.app.Config once it has an edge-cost formula
     private static double effectiveCost(Edge e) {
         return e.travelTimeSecs * e.roadConditionWeight;
     }
@@ -34,6 +32,11 @@ public class PrimMST {
     }
 
     public MSTResult run(Graph graph, String startId) {
+        return run(graph, startId, false);
+    }
+
+    
+    public MSTResult run(Graph graph, String startId, boolean trace) {
         String[] allIds = graph.getAllNodeIds();
         int n = allIds.length;
 
@@ -54,6 +57,11 @@ public class PrimMST {
         int mstCount = 0;
         double totalCost = 0;
 
+        if (trace) {
+            System.out.printf("%-6s %-10s %-10s %-10s %-15s%n",
+                "Step", "From", "To", "Cost", "RunningTotal");
+        }
+
         while (treeSize < n) {
             Edge best = null;
             double bestCost = Double.POSITIVE_INFINITY;
@@ -69,7 +77,7 @@ public class PrimMST {
                     int otherIndex = indexOf(allIds, other);
 
                     if (otherIndex == -1 || inTree[otherIndex]) {
-                        continue; // both ends already in tree, would form a cycle
+                        continue;
                     }
                     double cost = effectiveCost(e);
                     if (cost < bestCost) {
@@ -80,7 +88,9 @@ public class PrimMST {
             }
 
             if (best == null) {
-                // remaining nodes aren't reachable - graph is disconnected
+                if (trace) {
+                    System.out.println("No more reachable edges -- graph disconnected, stopping.");
+                }
                 break;
             }
 
@@ -93,6 +103,11 @@ public class PrimMST {
             mstEdges[mstCount] = best;
             mstCount++;
             totalCost += bestCost;
+
+            if (trace) {
+                System.out.printf("%-6d %-10s %-10s %-10.2f %-15.2f%n",
+                    mstCount, best.fromId, best.toId, bestCost, totalCost);
+            }
         }
 
         Edge[] result = new Edge[mstCount];
