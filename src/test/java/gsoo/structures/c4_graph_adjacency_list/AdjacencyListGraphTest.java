@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AdjacencyListGraphTest {
 
-    // NORMAL CASE: typical small graph, mix of directed and undirected edges,
-    // matching the real domain (community -> gateway -> ward).
     @Test
     void normalCase_addNodesAndEdges_neighborsRespectDirection() {
         AdjacencyListGraph graph = new AdjacencyListGraph();
@@ -16,8 +14,8 @@ class AdjacencyListGraphTest {
         graph.addNode("GATEWAY", "gateway");
         graph.addNode("WARD_01", "ward");
 
-        graph.addEdge("COMM_01", "GATEWAY", 2000, 300, 1.0, false);
-        graph.addEdge("GATEWAY", "WARD_01", 50, 20, 1.2, true);
+        graph.addEdge("COMM_01", "GATEWAY", 2000, 300, 1.0, false, false);
+        graph.addEdge("GATEWAY", "WARD_01", 50, 20, 1.2, true, false);
 
         assertEquals(3, graph.nodeCount());
         assertEquals(2, graph.edgeCount());
@@ -27,8 +25,6 @@ class AdjacencyListGraphTest {
         assertEquals(1, graph.getConnections("WARD_01").length);
     }
 
-    // BOUNDARY CASE: a node with zero edges. Nothing should break, and
-    // both neighbor methods should return empty (not null) arrays.
     @Test
     void boundaryCase_isolatedNodeWithNoEdges() {
         AdjacencyListGraph graph = new AdjacencyListGraph();
@@ -47,8 +43,6 @@ class AdjacencyListGraphTest {
         assertEquals(0, connections.length);
     }
 
-    // INVALID INPUT CASE: operations that should throw rather than silently
-    // fail or corrupt state.
     @Test
     void invalidInput_throwsOnBadOperations() {
         AdjacencyListGraph graph = new AdjacencyListGraph();
@@ -57,7 +51,7 @@ class AdjacencyListGraphTest {
         assertThrows(IllegalArgumentException.class, () -> graph.addNode("A", "community"));
 
         assertThrows(IllegalArgumentException.class,
-            () -> graph.addEdge("A", "DOES_NOT_EXIST", 100, 50, 1.0, false));
+            () -> graph.addEdge("A", "DOES_NOT_EXIST", 100, 50, 1.0, false, false));
 
         assertThrows(IllegalArgumentException.class, () -> graph.getNeighbors("NOPE"));
     }
