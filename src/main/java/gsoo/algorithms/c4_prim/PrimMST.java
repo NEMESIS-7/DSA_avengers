@@ -18,12 +18,6 @@ public class PrimMST {
         }
     }
 
-    // TODO: switch to gsoo.app.Config once it exists, so this matches the
-    // one project-wide cost formula instead of duplicating it here.
-    private static double effectiveCost(Edge e) {
-        return e.travelTimeSecs * e.roadConditionWeight;
-    }
-
     private static int indexOf(String[] ids, String target) {
         for (int i = 0; i < ids.length; i++) {
             if (ids[i].equals(target)) {
@@ -71,7 +65,7 @@ public class PrimMST {
                     if (otherIndex == -1 || inTree[otherIndex]) {
                         continue; // both ends already in tree, would form a cycle
                     }
-                    double cost = effectiveCost(e);
+                    double cost = e.effectiveCost();
                     if (cost < bestCost) {
                         bestCost = cost;
                         best = e;

@@ -2,15 +2,24 @@ package gsoo.app;
 
 import gsoo.algorithms.a1_binary_search.BinarySearch;
 import gsoo.algorithms.b1_quicksort.QuickSort;
+import gsoo.algorithms.b2_merge_sort.MergeSort;
 import gsoo.algorithms.b3_brute_force.BruteForceAssignment;
+import gsoo.algorithms.b4_selection_sort.SelectionSort;
+import gsoo.algorithms.c3_kruskal.Kruskal;
+import gsoo.algorithms.c4_prim.PrimMST;
 import gsoo.db.AuditEvent;
 import gsoo.db.DatabaseLoader;
+import gsoo.db.Location;
 import gsoo.db.Resource;
+import gsoo.db.Road;
 import gsoo.db.ServiceRequest;
 import gsoo.structures.Graph;
 import gsoo.structures.a3_stack.Stack;
 import gsoo.structures.a4_queue_circular_queue.CircularQueue;
 import gsoo.structures.a4_queue_circular_queue.DynamicQueue;
+import gsoo.structures.b2_avl_tree.AVLTree;
+import gsoo.structures.b4_hash_table.HashTable;
+import gsoo.structures.c5_graph_adjacency_matrix.AdjacencyMatrixGraph;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -52,6 +61,13 @@ public class Main {
             new Chapter("c4", "C", "Look at its location's road connections", Main::graphChapter),
             new Chapter("b1", "B", "Sort today's queue by urgency (quicksort)", Main::quickSortChapter),
             new Chapter("b3b", "B", "Brute-force assign 3 porters to 3 jobs", Main::bruteForceChapter),
+            new Chapter("b2a", "B", "Stress-test the AVL tree's balance", Main::avlChapter),
+            new Chapter("b2b", "B", "Sort fairly — merge sort's stability", Main::mergeSortChapter),
+            new Chapter("b4a", "B", "Look it up in the hash table", Main::hashTableChapter),
+            new Chapter("b4b", "B", "Selection sort — the deliberate worst performer", Main::selectionSortChapter),
+            new Chapter("c3", "C", "Minimum spanning tree — Kruskal", Main::kruskalChapter),
+            new Chapter("c4b", "C", "Minimum spanning tree — Prim", Main::primChapter),
+            new Chapter("c5", "C", "Same MST, matrix-backed instead of list-backed", Main::adjacencyMatrixChapter),
     };
 
     private static final Session session = new Session();
@@ -86,7 +102,7 @@ public class Main {
                 : "Dataset not loaded yet — start with option 1.");
         System.out.println("  1. Load the real dataset");
         System.out.println("  2. Run the full story, start to finish");
-        System.out.println("  3. Explore chapters by pod (" + CHAPTERS.length + " of 15 slots wired in so far)");
+        System.out.println("  3. Explore chapters by pod (" + distinctSlotCount() + " of 15 slots wired in so far)");
         System.out.println("  q. Quit");
         System.out.print("> ");
     }
@@ -140,6 +156,30 @@ public class Main {
         }
         System.out.println("  b. Back    q. Quit");
         System.out.print("> ");
+    }
+
+    // Several slots (A4, B2, B3, B4, C4) contribute more than one chapter, so
+    // CHAPTERS.length overcounts "slots wired in". A chapter's slot is its
+    // code's first two characters (pod letter + single-digit slot number,
+    // e.g. "a4a" and "a4b" both belong to slot "a4") — every current code
+    // follows that shape.
+    private static int distinctSlotCount() {
+        String[] slots = new String[CHAPTERS.length];
+        int count = 0;
+        for (Chapter c : CHAPTERS) {
+            String slot = c.code().substring(0, 2);
+            boolean seen = false;
+            for (int i = 0; i < count; i++) {
+                if (slots[i].equals(slot)) {
+                    seen = true;
+                    break;
+                }
+            }
+            if (!seen) {
+                slots[count++] = slot;
+            }
+        }
+        return count;
     }
 
     private static String[] distinctPodsInOrder() {
@@ -290,8 +330,7 @@ public class Main {
             System.out.println("  (none directly connected)");
         }
         for (Graph.Edge e : neighbors) {
-            double effectiveCost = e.travelTimeSecs * e.roadConditionWeight;
-            System.out.println("  " + e.fromId + " -> " + e.toId + " cost=" + effectiveCost);
+            System.out.println("  " + e.fromId + " -> " + e.toId + " cost=" + e.effectiveCost());
         }
         System.out.println("(Multi-hop shortest path needs Dijkstra — C2's heap and Dijkstra "
                 + "aren't merged yet, so this chapter stops at direct connections.)");
@@ -392,6 +431,171 @@ public class Main {
                 + "to a fixed penalty otherwise, since multi-hop routing needs Dijkstra, not merged yet.)");
     }
 
+    private static void avlChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        // Sequential inserts are the exact case that degrades a plain BST into
+        // a linked list (height n-1) — this is the same stress test
+        // AVLTreeTest.sequentialInsertsStayBalanced() runs, scaled up to the
+        // real dataset size instead of a toy n=15.
+        int n = session.requests.length;
+        AVLTree<Integer> tree = new AVLTree<>();
+        for (int i = 1; i <= n; i++) {
+            tree.insert(i);
+        }
+        double log2n = Math.log(n + 1) / Math.log(2);
+        System.out.println("Inserted " + n + " sequential values (the worst case for a plain BST) into the AVL tree.");
+        System.out.println("Resulting height: " + tree.height() + "  (log2(" + (n + 1) + ") ~ "
+                + String.format("%.1f", log2n) + " — a degenerate BST would instead be height " + (n - 1) + ")");
+        System.out.println("(This is the same lesson as B1's BST from the other direction: sorted/sequential "
+                + "input is B1's worst case and does nothing to B2, because B2 rebalances after every insert.)");
+    }
+
+    private record PriorityEntry(int urgency, String requestId) implements Comparable<PriorityEntry> {
+        @Override
+        public int compareTo(PriorityEntry other) {
+            return Integer.compare(urgency, other.urgency);
+        }
+
+        @Override
+        public String toString() {
+            return requestId + " (urgency " + urgency + ")";
+        }
+    }
+
+    private static void mergeSortChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        PriorityEntry[] entries = new PriorityEntry[session.requests.length];
+        for (int i = 0; i < session.requests.length; i++) {
+            ServiceRequest r = session.requests[i];
+            entries[i] = new PriorityEntry(r.urgency, r.requestId);
+        }
+
+        // Find two real requests that already share a urgency and are adjacent
+        // in arrival order, so the stability claim below is checkable by eye.
+        int tieA = -1, tieB = -1;
+        for (int i = 0; i < entries.length - 1; i++) {
+            if (entries[i].urgency() == entries[i + 1].urgency()) {
+                tieA = i;
+                tieB = i + 1;
+                break;
+            }
+        }
+
+        System.out.println("Before (first 10 of " + entries.length + "): "
+                + Arrays.toString(Arrays.copyOf(entries, 10)));
+        MergeSort.sort(entries);
+        System.out.println("After  (first 10, ascending by urgency): "
+                + Arrays.toString(Arrays.copyOf(entries, 10)));
+
+        if (tieA != -1) {
+            System.out.println("Stability check: " + session.requests[tieA].requestId + " arrived before "
+                    + session.requests[tieB].requestId + " with the same urgency (" + entries[tieA].urgency() + ") — "
+                    + "merge sort must keep them in that same relative order after sorting.");
+        }
+        System.out.println("(Contrast with the quicksort chapter: same urgency values, but merge sort's stability "
+                + "means arrival order survives as the tiebreaker — that's the fairness argument B2 makes.)");
+    }
+
+    private static void hashTableChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        HashTable table = new HashTable();
+        for (ServiceRequest r : session.requests) {
+            table.insert(r.requestId, r);
+        }
+        ServiceRequest found = table.search(session.focusRequest.requestId);
+        System.out.println("Inserted all " + table.getSize() + " real requests into the hash table "
+                + "(capacity " + table.getCapacity() + ", from Config.HASH_TABLE_SIZE — no separate copy of that number).");
+        System.out.println("search(\"" + session.focusRequest.requestId + "\") -> " + found);
+        System.out.println("Load factor: " + String.format("%.3f", table.getLoadFactor()));
+    }
+
+    private static void selectionSortChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        ServiceRequest[] copy = Arrays.copyOf(session.requests, session.requests.length);
+        int comparisons = SelectionSort.sort(copy);
+        System.out.println("Sorted all " + copy.length + " real requests by requestId.");
+        System.out.println("First: " + copy[0].requestId + "  Last: " + copy[copy.length - 1].requestId);
+        System.out.println("Comparisons made: " + comparisons + " (always ~n^2/2 regardless of input order — "
+                + "the deliberate worst-performer baseline the other sorts get measured against).");
+    }
+
+    private static void kruskalChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        Kruskal.Result result = new Kruskal().run(session.graph);
+        System.out.println("Kruskal's MST over the real " + session.graph.nodeCount() + "-node, "
+                + session.graph.edgeCount() + "-edge network:");
+        System.out.println("  Edges selected: " + result.mstEdges.length);
+        System.out.println("  Total effective cost: " + String.format("%.2f", result.totalCost));
+    }
+
+    private static void primChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        String startId = "GATE-01"; // the ambulance bay — the network's single external/internal join point
+        if (!session.graph.hasNode(startId)) {
+            System.out.println("Expected start node " + startId + " not found in the loaded graph.");
+            return;
+        }
+        PrimMST.MSTResult result = new PrimMST().run(session.graph, startId);
+        System.out.println("Prim's MST over the same network, starting from the gateway (" + startId + "):");
+        System.out.println("  Edges selected: " + result.edges.length + "  connected=" + result.connected);
+        System.out.println("  Total effective cost: " + String.format("%.2f", result.totalCost));
+        System.out.println("(Same MST problem as the Kruskal chapter, solved by growing outward from one node "
+                + "instead of sorting every edge — compare the two total costs.)");
+    }
+
+    private static void adjacencyMatrixChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        // C5 owns the dense INTERNAL corridor layout (team-charter.md §2.8) —
+        // built here as a second, matrix-backed Graph over just those real
+        // locations/roads, separate from C4's list-backed graph over the whole network.
+        AdjacencyMatrixGraph internalGraph = new AdjacencyMatrixGraph();
+        for (Location loc : session.locations) {
+            if ("INTERNAL".equals(loc.layer)) {
+                internalGraph.addNode(loc.locationId, loc.type);
+            }
+        }
+        int edgesAdded = 0;
+        for (Road road : session.roads) {
+            if (internalGraph.hasNode(road.fromLocationId) && internalGraph.hasNode(road.toLocationId)
+                    && !internalGraph.hasEdge(road.fromLocationId, road.toLocationId)) {
+                internalGraph.addEdge(road.fromLocationId, road.toLocationId,
+                        road.distanceM, road.travelTimeS, road.roadConditionWeight, false, road.isClosed);
+                edgesAdded++;
+            }
+        }
+        System.out.println("Built a second graph — adjacency matrix instead of adjacency list — over just the "
+                + internalGraph.nodeCount() + " real INTERNAL locations and " + edgesAdded + " real corridors "
+                + "(C5's dense internal layout, vs C4's sparse external+internal list).");
+
+        String[] internalIds = internalGraph.getAllNodeIds();
+        if (internalIds.length == 0) {
+            System.out.println("No INTERNAL nodes loaded — nothing to run Prim's over.");
+            return;
+        }
+        String startId = internalIds[0];
+        PrimMST.MSTResult result = new PrimMST().run(internalGraph, startId);
+        System.out.println("Prim's MST over this matrix-backed graph, starting from " + startId + ":");
+        System.out.println("  Edges selected: " + result.edges.length + "  connected=" + result.connected);
+        System.out.println("  Total effective cost: " + String.format("%.2f", result.totalCost));
+        System.out.println("(Same PrimMST class the earlier chapter used, completely unmodified — it only "
+                + "depends on the Graph interface, so it runs identically against C5's matrix as it did "
+                + "against C4's list. That's the point of coding against an interface.)");
+    }
+
     // ---------------- Small helpers ----------------
 
     private static Resource[] firstNOfType(Resource[] resources, String type, int n) {
@@ -476,7 +680,7 @@ public class Main {
         }
         for (Graph.Edge e : session.graph.getNeighbors(fromId)) {
             if (e.toId.equals(toId) || e.fromId.equals(toId)) {
-                return (int) Math.round(e.travelTimeSecs * e.roadConditionWeight);
+                return (int) Math.round(e.effectiveCost());
             }
         }
         return NO_DIRECT_ROAD_PENALTY;

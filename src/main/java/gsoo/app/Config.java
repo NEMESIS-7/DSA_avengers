@@ -5,17 +5,20 @@ package gsoo.app;
  * "nothing hardcoded" rule — the examiner can be shown this class as
  * the single place a priority rule, hash table size, etc. would change.
  *
- * STUB: S is a placeholder. The real value is the sum of the last three
- * digits of every team member's index number (team-charter.md §2.7),
- * collected once all 15 numbers are in (README open item #3, owned by A1).
- * Every derived constant below is a placeholder until S is replaced.
+ * S is the sum of the last three digits of every team member's index number
+ * (team-charter.md §2.7), computed from the confirmed roster of all 15 index
+ * numbers. A3 independently recomputed this and flagged a mismatch against
+ * an earlier 536 figure that had been circulating in gsoo.app.Config and
+ * elsewhere — 6316 is the value that actually matches the roster (it also
+ * matches the value already used to generate the real patient_ref seed
+ * data), so that's what's authoritative here.
  */
 public final class Config {
 
     private Config() {
     }
 
-    public static final int S = 536;
+    public static final int S = 6316;
 
     public static final int URGENCY_WEIGHT = 1 + (S % 5);
     public static final int HASH_TABLE_SIZE = smallestPrimeAtLeast(1000 + (S % 500));

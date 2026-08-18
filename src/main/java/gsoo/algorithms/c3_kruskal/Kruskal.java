@@ -94,7 +94,7 @@ public class Kruskal {
                         edge.fromId,
                         edge.toId);
 
-                totalCost += effectiveCost(edge);
+                totalCost += edge.effectiveCost();
 
                 /*
                  * Once we have V - 1 edges,
@@ -126,15 +126,6 @@ public class Kruskal {
     }
 
     /**
-     * Returns the hospital project's effective traversal cost.
-     */
-    private double effectiveCost(Graph.Edge edge) {
-
-        return edge.travelTimeSecs
-                * edge.roadConditionWeight;
-    }
-
-    /**
      * Custom insertion sort.
      *
      * Avoids relying on built-in collection sorting for
@@ -147,12 +138,12 @@ public class Kruskal {
             Graph.Edge current = edges[i];
 
             double currentCost =
-                    effectiveCost(current);
+                    current.effectiveCost();
 
             int j = i - 1;
 
             while (j >= 0
-                    && effectiveCost(edges[j])
+                    && edges[j].effectiveCost()
                     > currentCost) {
 
                 edges[j + 1] = edges[j];

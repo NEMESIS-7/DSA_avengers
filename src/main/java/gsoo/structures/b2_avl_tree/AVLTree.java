@@ -1,6 +1,5 @@
 package gsoo.structures.b2_avl_tree;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 

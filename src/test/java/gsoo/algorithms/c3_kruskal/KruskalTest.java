@@ -208,6 +208,7 @@ public class KruskalTest {
                     roadDistance[i],
                     roadTravelTime[i],
                     roadWeight[i],
+                    false,
                     false
             );
         }
@@ -262,8 +263,7 @@ public class KruskalTest {
                     result.mstEdges[i];
 
             double cost =
-                    edge.travelTimeSecs
-                            * edge.roadConditionWeight;
+                    edge.effectiveCost();
 
             System.out.printf(
                     "%d | %s | %s | %.2f%n",
@@ -337,6 +337,7 @@ public class KruskalTest {
                 10,
                 1,
                 1.0,
+                false,
                 false
         );
 
@@ -346,6 +347,7 @@ public class KruskalTest {
                 10,
                 2,
                 1.0,
+                false,
                 false
         );
 
@@ -355,6 +357,7 @@ public class KruskalTest {
                 10,
                 5,
                 1.0,
+                false,
                 false
         );
 
@@ -364,6 +367,7 @@ public class KruskalTest {
                 10,
                 1.5,
                 1.0,
+                false,
                 false
         );
 
@@ -373,6 +377,7 @@ public class KruskalTest {
                 10,
                 4,
                 1.0,
+                false,
                 false
         );
 
@@ -469,6 +474,7 @@ public class KruskalTest {
                 50,
                 10,
                 1.0,
+                false,
                 false
         ); // cost = 10
 
@@ -477,6 +483,7 @@ public class KruskalTest {
                 40,
                 8,
                 1.0,
+                false,
                 false
         ); // cost = 8
 
@@ -485,6 +492,7 @@ public class KruskalTest {
                 30,
                 5,
                 1.0,
+                false,
                 false
         ); // cost = 5
 
@@ -493,6 +501,7 @@ public class KruskalTest {
                 70,
                 15,
                 1.0,
+                false,
                 false
         ); // cost = 15
 
@@ -501,6 +510,7 @@ public class KruskalTest {
                 60,
                 12,
                 1.0,
+                false,
                 false
         ); // cost = 12
 
@@ -523,8 +533,7 @@ public class KruskalTest {
                     result.mstEdges[i];
 
             double cost =
-                    edge.travelTimeSecs
-                            * edge.roadConditionWeight;
+                    edge.effectiveCost();
 
             trace.append(i + 1)
                     .append(" | ")

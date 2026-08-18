@@ -51,5 +51,16 @@ public interface Graph {
             this.directed = directed;
             this.isClosed = isClosed;
         }
+
+        /**
+         * The single project-wide traversal cost formula (team-charter.md §2.4):
+         * effective cost = travelTimeSecs x roadConditionWeight. Every algorithm
+         * that weighs edges (Dijkstra, Kruskal, Prim, ...) should call this
+         * instead of recomputing the formula itself, so it's never computed two
+         * different ways in two different classes.
+         */
+        public double effectiveCost() {
+            return travelTimeSecs * roadConditionWeight;
+        }
     }
 }
