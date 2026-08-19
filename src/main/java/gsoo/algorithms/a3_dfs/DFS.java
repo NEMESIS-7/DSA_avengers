@@ -4,22 +4,6 @@ import gsoo.structures.Graph;
 import gsoo.structures.Graph.Edge;
 import gsoo.structures.a3_stack.Stack;
 
-// ================================================================
-// A3 — DFS: reachable departments when a corridor closes
-//
-// Two things can make a corridor "closed" here:
-//   1. The road's own is_closed flag from the real data (schema.sql)
-//   2. An extra corridor we're simulating as closed just for this
-//      run, without needing a removeEdge() on the Graph interface
-//      at all — we just skip that one edge while walking neighbors.
-//
-// Uses our own Stack, same one from the audit trail. Same underlying
-// idea both places: "last placed, first removed." For undo it meant
-// reversing the most recent action first. Here it means backtracking
-// out of a dead end by going back to wherever we most recently were,
-// not by picking some arbitrary earlier point.
-// ================================================================
-
 public class DFS {
 
     public static class ReachabilityResult {
