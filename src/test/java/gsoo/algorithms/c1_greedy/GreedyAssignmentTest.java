@@ -6,13 +6,13 @@ public class GreedyAssignmentTest {
 
     public static void main(String[] args) {
 
+        GreedyAssignment greedy = new GreedyAssignment();
+
         // ==========================================
         // TEST 1 - Normal Case
         // ==========================================
 
         System.out.println("TEST 1 - Normal Case");
-
-        GreedyAssignment greedy = new GreedyAssignment();
 
         int[][] cost = {
             {10, 2, 8},
@@ -125,6 +125,120 @@ public class GreedyAssignmentTest {
         }
 
         System.out.println();
+
+
+        // ==========================================
+        // TEST 3 - Boundary Case
+        // ==========================================
+
+        System.out.println("TEST 3 - Boundary Case");
+
+        /*
+         * Boundary case:
+         * One porter and one job.
+         *
+         * The only porter should be assigned
+         * to the only available job.
+         */
+
+        int[][] boundaryCost = {
+            {5}
+        };
+
+        int[] boundaryUrgency = {
+            10
+        };
+
+        GreedyAssignment.Result boundaryResult =
+                greedy.solve(
+                        boundaryCost,
+                        boundaryUrgency
+                );
+
+        System.out.println(
+                "Boundary total cost: "
+                + boundaryResult.totalCost
+        );
+
+        System.out.println(
+                "Boundary assignment: Porter 0 -> Job "
+                + boundaryResult.assignment[0]
+        );
+
+        if (boundaryResult.totalCost == 5
+                && boundaryResult.assignment[0] == 0) {
+
+            System.out.println("PASS");
+
+        } else {
+
+            System.out.println("FAIL");
+        }
+
+        System.out.println();
+
+
+        // ==========================================
+        // TEST 4 - Invalid Input
+        // ==========================================
+
+        System.out.println("TEST 4 - Invalid Input");
+
+        /*
+         * Invalid case 1:
+         * Null cost matrix.
+         */
+
+        try {
+
+            greedy.solve(
+                    null,
+                    new int[]{10}
+            );
+
+            System.out.println(
+                    "FAIL - Null cost matrix was accepted."
+            );
+
+        } catch (IllegalArgumentException e) {
+
+            System.out.println(
+                    "PASS - Null cost matrix rejected."
+            );
+        }
+
+
+        /*
+         * Invalid case 2:
+         * Number of urgency values does not match
+         * the number of jobs.
+         */
+
+        try {
+
+            greedy.solve(
+                    new int[][]{{5}},
+                    new int[]{10, 20}
+            );
+
+            System.out.println(
+                    "FAIL - Mismatched urgency length was accepted."
+            );
+
+        } catch (IllegalArgumentException e) {
+
+            System.out.println(
+                    "PASS - Mismatched urgency length rejected."
+            );
+        }
+
+        System.out.println();
+
+
+        // ==========================================
+        // ALL TESTS COMPLETED
+        // ==========================================
+
         System.out.println(
                 "C1 Greedy Assignment tests completed."
         );
