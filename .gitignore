@@ -1,0 +1,13 @@
+.idea/
+target/ 
+/.env
+=======
+# IntelliJ project files
+.idea/
+*.iml
+
+# Maven build output
+target/
+
+# Logs
+*.log
