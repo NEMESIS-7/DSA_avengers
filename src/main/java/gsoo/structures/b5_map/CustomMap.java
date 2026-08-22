@@ -106,12 +106,11 @@ public class CustomMap<K, V> {
     }
 
     /** Returns all keys currently stored, in insertion order. */
-    @SuppressWarnings("unchecked")
-    public K[] keySet() {
-        K[] result = (K[]) new Object[size];
-        System.arraycopy(keys, 0, result, 0, size);
-        return result;
-    }
+   public Object[] keySet() {
+    Object[] result = new Object[size];
+    System.arraycopy(keys, 0, result, 0, size);
+    return result;
+}
 
     // --- internal helpers ---
 
