@@ -31,6 +31,26 @@ Search and insert are both O(log n), since the tree height grows logarithmically
 
 All 4 tests pass (`BTreeTest.java`). One known limitation: deletion is not yet implemented — only insert and search.
 
+### 2.3 Trace Table — B-tree Insert Sequence
+
+| Step | Insert | Resulting State |
+|---|---|---|
+| 1 | REQ-0001 | root = [REQ-0001] |
+| 2 | REQ-0002 | root = [REQ-0001, REQ-0002] |
+| 3 | REQ-0003 | root = [REQ-0001, REQ-0002, REQ-0003] (full) |
+| 4 | REQ-0004 | **split** — root = [REQ-0002]; children = [REQ-0001], [REQ-0003, REQ-0004] |
+| 5 | REQ-0005 | root = [REQ-0002]; children = [REQ-0001], [REQ-0003, REQ-0004, REQ-0005] (full) |
+| 6 | REQ-0006 | **split** — root = [REQ-0002, REQ-0004]; children = [REQ-0001], [REQ-0003], [REQ-0005, REQ-0006] |
+| 7 | REQ-0007 | root = [REQ-0002, REQ-0004]; children = [REQ-0001], [REQ-0003], [REQ-0005, REQ-0006, REQ-0007] (full) |
+| 8 | REQ-0008 | **split** — root = [REQ-0002, REQ-0004, REQ-0006]; children = [REQ-0001], [REQ-0003], [REQ-0005], [REQ-0007, REQ-0008] |
+
+**Search trace:**
+
+| Query | Path | Result |
+|---|---|---|
+| REQ-0004 | Visit root [REQ-0002, REQ-0004, REQ-0006] | Found at index 1 → `Request REQ-0004` |
+| REQ-9999 | Visit root → REQ-9999 > REQ-0006 → descend to child 3 → visit leaf [REQ-0007, REQ-0008] | Not found → `null` |
+
 ## 3. Algorithm: Brute Force (Porter-to-Job Assignment)
 
 Given a set of available porters and a set of pending jobs, the algorithm tries every possible one-to-one pairing (every permutation), computes the total cost of each, and keeps whichever pairing has the lowest total cost. It is exhaustive by design — correct by definition, since it never skips a candidate solution — which makes it a useful correctness baseline to compare faster, heuristic approaches (such as a greedy assignment) against.
@@ -56,6 +76,37 @@ O(n!) — factorial — since every permutation of jobs is generated and scored.
 | Invalid input | A non-square matrix (unequal porters vs jobs) throws `IllegalArgumentException`; a null matrix throws `NullPointerException`. | Pass |
 
 All 4 tests pass (`BruteForceAssignmentTest.java`). Known limitation: only practical for small n by design — not intended for direct use against the full 300-request dataset.
+
+### 3.3 Trace Table — Brute Force, All 24 Permutations Evaluated
+
+| # | Assignment | Total Cost |
+|---|---|---|
+| 1 | RES-P01→REQ-0005, RES-P02→REQ-0008, RES-P03→REQ-0010, RES-P04→REQ-0012 | 43 |
+| 2 | RES-P01→REQ-0005, RES-P02→REQ-0008, RES-P03→REQ-0012, RES-P04→REQ-0010 | 43 |
+| 3 | RES-P01→REQ-0005, RES-P02→REQ-0010, RES-P03→REQ-0008, RES-P04→REQ-0012 | 30 |
+| 4 | RES-P01→REQ-0005, RES-P02→REQ-0010, RES-P03→REQ-0012, RES-P04→REQ-0008 | 39 |
+| 5 | RES-P01→REQ-0005, RES-P02→REQ-0012, RES-P03→REQ-0008, RES-P04→REQ-0010 | 36 |
+| 6 | RES-P01→REQ-0005, RES-P02→REQ-0012, RES-P03→REQ-0010, RES-P04→REQ-0008 | 45 |
+| 7 | RES-P01→REQ-0008, RES-P02→REQ-0005, RES-P03→REQ-0010, RES-P04→REQ-0012 | 32 |
+| 8 | RES-P01→REQ-0008, RES-P02→REQ-0005, RES-P03→REQ-0012, RES-P04→REQ-0010 | 32 |
+| 9 | RES-P01→REQ-0008, RES-P02→REQ-0010, RES-P03→REQ-0005, RES-P04→REQ-0012 | 33 |
+| 10 | RES-P01→REQ-0008, RES-P02→REQ-0010, RES-P03→REQ-0012, RES-P04→REQ-0005 | 28 **← minimum** |
+| 11 | RES-P01→REQ-0008, RES-P02→REQ-0012, RES-P03→REQ-0005, RES-P04→REQ-0010 | 39 |
+| 12 | RES-P01→REQ-0008, RES-P02→REQ-0012, RES-P03→REQ-0010, RES-P04→REQ-0005 | 34 |
+| 13 | RES-P01→REQ-0010, RES-P02→REQ-0005, RES-P03→REQ-0008, RES-P04→REQ-0012 | 29 |
+| 14 | RES-P01→REQ-0010, RES-P02→REQ-0005, RES-P03→REQ-0012, RES-P04→REQ-0008 | 38 |
+| 15 | RES-P01→REQ-0010, RES-P02→REQ-0008, RES-P03→REQ-0005, RES-P04→REQ-0012 | 43 |
+| 16 | RES-P01→REQ-0010, RES-P02→REQ-0008, RES-P03→REQ-0012, RES-P04→REQ-0005 | 38 |
+| 17 | RES-P01→REQ-0010, RES-P02→REQ-0012, RES-P03→REQ-0005, RES-P04→REQ-0008 | 45 |
+| 18 | RES-P01→REQ-0010, RES-P02→REQ-0012, RES-P03→REQ-0008, RES-P04→REQ-0005 | 31 |
+| 19 | RES-P01→REQ-0012, RES-P02→REQ-0005, RES-P03→REQ-0008, RES-P04→REQ-0010 | 36 |
+| 20 | RES-P01→REQ-0012, RES-P02→REQ-0005, RES-P03→REQ-0010, RES-P04→REQ-0008 | 45 |
+| 21 | RES-P01→REQ-0012, RES-P02→REQ-0008, RES-P03→REQ-0005, RES-P04→REQ-0010 | 50 |
+| 22 | RES-P01→REQ-0012, RES-P02→REQ-0008, RES-P03→REQ-0010, RES-P04→REQ-0005 | 45 |
+| 23 | RES-P01→REQ-0012, RES-P02→REQ-0010, RES-P03→REQ-0005, RES-P04→REQ-0008 | 46 |
+| 24 | RES-P01→REQ-0012, RES-P02→REQ-0010, RES-P03→REQ-0008, RES-P04→REQ-0005 | 32 |
+
+All 24 possible pairings for 4 real porters and 4 real pending requests, computed directly from the same cost matrix `BruteForceTraceDemo.java` uses. Row 10 is the minimum-cost assignment — matches the program's own reported result exactly.
 
 ## 4. Current Status and Next Steps
 
