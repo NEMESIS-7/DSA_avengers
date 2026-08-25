@@ -6,11 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="DSA_avengers" />
+        <module name="gsoo-project" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="gsoo-project" target="21" />
-    </bytecodeTargetLevel>
   </component>
 </project>

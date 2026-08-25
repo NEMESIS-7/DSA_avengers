@@ -23,6 +23,28 @@ public final class Config {
     public static final long RANDOM_SEED = S;
     public static final int SHIFT_BUDGET_MINUTES = 240 + (S % 120);
 
+    /**
+     * Flood-prone / infection-control-restricted roads are the ones whose
+     * road_condition_weight already exceeds the 1.0 "good/flat" baseline.
+     * C2's Dijkstra charges ROUTE_PENALTY on top of those (README §2.4) —
+     * anything with weight >= this threshold counts.
+     */
+    public static final double FLOOD_PRONE_WEIGHT_THRESHOLD = 1.5;
+
+    /**
+     * Effective edge cost = travelTime x roadConditionWeight (README §2.2),
+     * defined once here so no algorithm ever recomputes it differently.
+     * Flood-prone roads (weight >= FLOOD_PRONE_WEIGHT_THRESHOLD) additionally
+     * take ROUTE_PENALTY as a multiplier — the index-derived tunable C2 uses.
+     */
+    public static double effectiveEdgeCost(double travelTimeSecs, double roadConditionWeight) {
+        double base = travelTimeSecs * roadConditionWeight;
+        if (roadConditionWeight >= FLOOD_PRONE_WEIGHT_THRESHOLD) {
+            return base * ROUTE_PENALTY;
+        }
+        return base;
+    }
+
     /** priority = urgencyWeight x urgency + slackFactor / max(1, minutesUntilDeadline) */
     public static double dispatchPriority(int urgency, double slackFactor, long minutesUntilDeadline) {
         return URGENCY_WEIGHT * urgency + slackFactor / Math.max(1, minutesUntilDeadline);
