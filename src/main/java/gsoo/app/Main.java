@@ -1,6 +1,7 @@
 package gsoo.app;
 
 import gsoo.algorithms.a1_binary_search.BinarySearch;
+import gsoo.algorithms.a2_linear_search.LinearSearch;
 import gsoo.algorithms.a3_dfs.DFS;
 import gsoo.algorithms.a5_insertion_sort.InsertionSort;
 import gsoo.algorithms.b1_quicksort.QuickSort;
@@ -19,6 +20,7 @@ import gsoo.db.Resource;
 import gsoo.db.Road;
 import gsoo.db.ServiceRequest;
 import gsoo.structures.Graph;
+import gsoo.structures.a2_linked_list.LinkedList;
 import gsoo.structures.a3_stack.Stack;
 import gsoo.structures.a4_queue_circular_queue.CircularQueue;
 import gsoo.structures.a4_queue_circular_queue.DynamicQueue;
@@ -49,10 +51,10 @@ import java.util.Scanner;
  * order (array order) and the pod grouping (each chapter's {@code pod} tag) —
  * adding a chapter for a newly-merged slot is one array entry, not a rewrite.
  *
- * Only as true a story as what's actually merged: no priority queue,
- * routing, or dispatch algorithm exists yet (C1/C2/C5), so the walkthrough
- * stops at "index, look up, and inspect a real request" — it does not yet
- * decide, route, or dispatch anything. Each chapter says so where it applies.
+ * Only as true a story as what's actually merged: no priority queue or
+ * shortest-path routing exists yet (C2 — heap and Dijkstra), so the
+ * walkthrough stops short of an actual live dispatch/routing decision.
+ * Each chapter says so where it applies.
  */
 public class Main {
 
@@ -82,6 +84,8 @@ public class Main {
             new Chapter("c1a", "C", "Track locked-down departments — hash set", Main::hashSetChapter),
             new Chapter("c1b", "C", "Greedy vs brute-force assignment", Main::greedyChapter),
             new Chapter("c5b", "C", "Plan one shift under the time budget — DP knapsack", Main::knapsackChapter),
+            new Chapter("a2a", "A", "Its event timeline — linked list", Main::eventTimelineChapter),
+            new Chapter("a2b", "A", "Scan for it without an index — linear search", Main::linearSearchChapter),
     };
 
     private static final Session session = new Session();
@@ -765,6 +769,64 @@ public class Main {
         } catch (IllegalArgumentException e) {
             System.out.println("Couldn't plan this shift: " + e.getMessage());
         }
+    }
+
+    private static void eventTimelineChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        // Read-only, append-in-order — the other real event history for a
+        // request, A3's Stack (audit_events, undo-dispatch), is push/pop and
+        // writes to the live DB. This is the plain "what happened, in
+        // order" view: no undo, just iterate the real node chain.
+        ServiceRequest r = session.focusRequest;
+        LinkedList<String> timeline = new LinkedList<>();
+        timeline.add(r.requestId + " CREATED at " + r.submittedAt);
+        timeline.add(r.requestId + " currently " + r.status);
+        if (r.assignedResourceId != null) {
+            timeline.add(r.requestId + " assigned to " + r.assignedResourceId);
+        }
+        timeline.add(r.requestId + " deadline " + r.deadlineAt);
+
+        System.out.println("Built a " + timeline.size() + "-event timeline for " + r.requestId
+                + " and walked it with the list's own iterator:");
+        for (String event : timeline) {
+            System.out.println("  " + event);
+        }
+    }
+
+    private static void linearSearchChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        // Same real sorted id array the a1 chapter searches — deliberately,
+        // so the comparison counts below are a fair, same-input measurement
+        // of linear vs. binary search, not two different setups.
+        String[] ids = new String[session.requestTable.size()];
+        for (int i = 0; i < session.requestTable.size(); i++) {
+            ids[i] = session.requestTable.get(i).requestId;
+        }
+
+        LinearSearch<String> search = new LinearSearch<>();
+        int index = search.search(ids, session.focusRequest.requestId);
+        int comparisons = index == -1 ? ids.length : index + 1;
+
+        System.out.println("search(\"" + session.focusRequest.requestId + "\") over "
+                + ids.length + " real request IDs, no index, no ordering assumed -> index " + index);
+        System.out.println("Comparisons made: " + comparisons
+                + " (worst case n=" + ids.length + " — contrast with the a1 chapter's binary "
+                + "search on the same array, which never takes more than " + worstCaseBinarySearchComparisons(ids.length)
+                + " comparisons).");
+    }
+
+    private static int worstCaseBinarySearchComparisons(int n) {
+        int comparisons = 0;
+        int range = n;
+        while (range > 0) {
+            range /= 2;
+            comparisons++;
+        }
+        return comparisons;
     }
 
     // ---------------- Small helpers ----------------
