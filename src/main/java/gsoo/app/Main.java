@@ -1,12 +1,17 @@
 package gsoo.app;
 
 import gsoo.algorithms.a1_binary_search.BinarySearch;
+import gsoo.algorithms.a3_dfs.DFS;
+import gsoo.algorithms.a5_insertion_sort.InsertionSort;
 import gsoo.algorithms.b1_quicksort.QuickSort;
 import gsoo.algorithms.b2_merge_sort.MergeSort;
 import gsoo.algorithms.b3_brute_force.BruteForceAssignment;
 import gsoo.algorithms.b4_selection_sort.SelectionSort;
+import gsoo.algorithms.c1_greedy.GreedyAssignment;
 import gsoo.algorithms.c3_kruskal.Kruskal;
 import gsoo.algorithms.c4_prim.PrimMST;
+import gsoo.algorithms.c5_dp_knapsack.HospitalKnapsackPlanner;
+import gsoo.algorithms.c5_dp_knapsack.Knapsack;
 import gsoo.db.AuditEvent;
 import gsoo.db.DatabaseLoader;
 import gsoo.db.Location;
@@ -17,13 +22,16 @@ import gsoo.structures.Graph;
 import gsoo.structures.a3_stack.Stack;
 import gsoo.structures.a4_queue_circular_queue.CircularQueue;
 import gsoo.structures.a4_queue_circular_queue.DynamicQueue;
+import gsoo.structures.a5_deque.CustomDeque;
 import gsoo.structures.b2_avl_tree.AVLTree;
 import gsoo.structures.b4_hash_table.HashTable;
+import gsoo.structures.c1_set.HashSet;
 import gsoo.structures.c5_graph_adjacency_matrix.AdjacencyMatrixGraph;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Scanner;
 
 /**
@@ -68,6 +76,12 @@ public class Main {
             new Chapter("c3", "C", "Minimum spanning tree — Kruskal", Main::kruskalChapter),
             new Chapter("c4b", "C", "Minimum spanning tree — Prim", Main::primChapter),
             new Chapter("c5", "C", "Same MST, matrix-backed instead of list-backed", Main::adjacencyMatrixChapter),
+            new Chapter("a3b", "A", "Departments still reachable if a corridor closes", Main::dfsChapter),
+            new Chapter("a5a", "A", "Triage deque — critical to front", Main::dequeChapter),
+            new Chapter("a5b", "A", "Sort near-sorted arrivals — insertion sort", Main::insertionSortChapter),
+            new Chapter("c1a", "C", "Track locked-down departments — hash set", Main::hashSetChapter),
+            new Chapter("c1b", "C", "Greedy vs brute-force assignment", Main::greedyChapter),
+            new Chapter("c5b", "C", "Plan one shift under the time budget — DP knapsack", Main::knapsackChapter),
     };
 
     private static final Session session = new Session();
@@ -594,6 +608,163 @@ public class Main {
         System.out.println("(Same PrimMST class the earlier chapter used, completely unmodified — it only "
                 + "depends on the Graph interface, so it runs identically against C5's matrix as it did "
                 + "against C4's list. That's the point of coding against an interface.)");
+    }
+
+    private static void dfsChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        ServiceRequest r = session.focusRequest;
+        String start = r.sourceLocationId;
+
+        DFS dfs = new DFS();
+        DFS.ReachabilityResult before = dfs.reachableFrom(session.graph, start);
+        System.out.println("From " + start + ", " + before.visitedCount + " of "
+                + session.graph.nodeCount() + " real locations are reachable right now.");
+
+        Graph.Edge[] neighbors = session.graph.getNeighbors(start);
+        if (neighbors.length == 0) {
+            System.out.println("(No outgoing roads from " + start + " to simulate closing.)");
+            return;
+        }
+        Graph.Edge toClose = neighbors[0];
+        DFS.ReachabilityResult after = dfs.reachableFrom(session.graph, start, toClose.fromId, toClose.toId);
+        System.out.println("Simulating the real road " + toClose.fromId + " -> " + toClose.toId + " as closed:");
+        System.out.println("  Reachable locations drops to " + after.visitedCount
+                + " (" + (before.visitedCount - after.visitedCount) + " fewer).");
+        System.out.println("(Real closed roads in the data are already respected too — this is one "
+                + "additional closure layered on top, for the 'what if' scenario.)");
+    }
+
+    private static void dequeChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        ServiceRequest[] pending = allWithStatus(session.requests, "PENDING");
+        CustomDeque<ServiceRequest> triage = new CustomDeque<>();
+        for (ServiceRequest r : pending) {
+            if (r.urgency >= 4) {
+                triage.addFirst(r); // critical — jump to the front
+            } else {
+                triage.addLast(r); // routine — join the back
+            }
+        }
+        System.out.println("Loaded " + triage.size() + " real PENDING requests into the triage deque "
+                + "(urgency >= 4 pushed to the front, everything else to the back).");
+        System.out.println("Next off the front (most critical): " + triage.peekFirst());
+        System.out.println("Last in line (least urgent): " + triage.peekLast());
+    }
+
+    private static void insertionSortChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        // A small slice, deliberately — insertion sort's whole story is being
+        // efficient on data that's already close to sorted, and sortWithTrace
+        // prints one line per pass, so a small n keeps that story readable
+        // instead of dumping 300 lines.
+        int sliceSize = Math.min(8, session.requests.length);
+        ServiceRequest[] slice = Arrays.copyOf(session.requests, sliceSize);
+        System.out.println("Sorting the first " + sliceSize + " real requests (arrival order) by urgency:");
+        InsertionSort.sortWithTrace(slice, Comparator.comparingInt(req -> req.urgency));
+    }
+
+    private static void hashSetChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        ServiceRequest r = session.focusRequest;
+        String start = r.sourceLocationId;
+
+        Graph.Edge[] neighbors = session.graph.getNeighbors(start);
+        DFS.ReachabilityResult reachable;
+        if (neighbors.length == 0) {
+            reachable = new DFS().reachableFrom(session.graph, start);
+        } else {
+            Graph.Edge toClose = neighbors[0];
+            reachable = new DFS().reachableFrom(session.graph, start, toClose.fromId, toClose.toId);
+        }
+
+        HashSet visited = new HashSet();
+        for (String id : reachable.reachableIds) {
+            visited.add(id);
+        }
+        System.out.println("Tracked " + visited.size() + " real locations still reachable from " + start
+                + " (with one corridor simulated closed) in a hash set.");
+
+        String[] allIds = session.graph.getAllNodeIds();
+        String lockedDown = null;
+        for (String id : allIds) {
+            if (!visited.contains(id)) {
+                lockedDown = id;
+                break;
+            }
+        }
+        System.out.println("contains(\"" + start + "\") -> " + visited.contains(start));
+        if (lockedDown != null) {
+            System.out.println("contains(\"" + lockedDown + "\") -> " + visited.contains(lockedDown)
+                    + "  (cut off by the simulated closure — a locked-down department)");
+        } else {
+            System.out.println("Every real location is still reachable — nothing locked down this time.");
+        }
+    }
+
+    private static void greedyChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        Resource[] porters = firstNOfType(session.resources, "porter", 3);
+        ServiceRequest[] pending = firstNPending(session.requests, 3);
+        if (porters.length < 3 || pending.length < 3) {
+            System.out.println("Not enough real porters/pending requests to build a 3x3 example.");
+            return;
+        }
+
+        int[][] cost = new int[3][3];
+        int[] urgency = new int[3];
+        for (int p = 0; p < 3; p++) {
+            for (int j = 0; j < 3; j++) {
+                cost[p][j] = travelCostOrFallback(porters[p].homeLocationId, pending[j].sourceLocationId);
+            }
+        }
+        for (int j = 0; j < 3; j++) {
+            urgency[j] = pending[j].urgency;
+        }
+
+        GreedyAssignment.Result greedy = new GreedyAssignment().solve(cost, urgency);
+        BruteForceAssignment.Result optimal = new BruteForceAssignment().solve(cost);
+
+        System.out.println("Same real porters/jobs as the brute-force chapter — same cost matrix, this time "
+                + "with real urgency values driving greedy's job order.");
+        System.out.println("Greedy total cost:      " + greedy.totalCost);
+        System.out.println("Brute-force (optimal):  " + optimal.totalCost);
+        if (greedy.totalCost > optimal.totalCost) {
+            System.out.println("Greedy landed on a worse total cost than the guaranteed-optimal brute-force "
+                    + "result — the counterexample, on real data, not a constructed one.");
+        } else {
+            System.out.println("Greedy matched the optimal cost this time — it doesn't always, which is exactly "
+                    + "why brute force stays the guaranteed-correct baseline.");
+        }
+    }
+
+    private static void knapsackChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        try {
+            Knapsack.Result result = new HospitalKnapsackPlanner().planOneShift(session.requests);
+            System.out.println("Planning one shift (" + result.capacityMinutes
+                    + " minutes, from Config.SHIFT_BUDGET_MINUTES) over every real PENDING request:");
+            System.out.println("  Requests selected: " + result.selectedItems.length);
+            System.out.println("  Minutes used: " + result.totalMinutes + " / " + result.capacityMinutes
+                    + "  (remaining: " + result.remainingMinutes() + ")");
+            System.out.println("  Total priority value served: " + result.totalValue);
+            if (result.selectedItems.length > 0) {
+                System.out.println("  First selected: " + result.selectedItems[0].requestId);
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Couldn't plan this shift: " + e.getMessage());
+        }
     }
 
     // ---------------- Small helpers ----------------

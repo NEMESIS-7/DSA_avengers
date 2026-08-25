@@ -1,4 +1,4 @@
-package gsoo.algorithms.b1_bst;
+package gsoo.structures.b1_bst;
 
 public class BinarySearchTree {
     private static class Node {
