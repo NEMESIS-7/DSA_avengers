@@ -1,8 +1,7 @@
 package gsoo.algorithms.a4_bfs;
 
-import gsoo.structures.Graph;
-import gsoo.structures.Graph.Edge;
 import gsoo.structures.a4_queue_circular_queue.DynamicQueue;
+import gsoo.structures.c5_graph_adjacency_matrix.Graph;
 
 public class BFS {
 
@@ -103,9 +102,9 @@ public class BFS {
             visitOrder[visitCount] = current;
             visitCount++;
 
-            Edge[] edges = graph.getNeighbors(current);
+            Graph.Edge[] edges = graph.getNeighbors(current);
             for (int i = 0; i < edges.length; i++) {
-                Edge e = edges[i];
+                Graph.Edge e = edges[i];
                 String neighbor = e.fromId.equals(current) ? e.toId : e.fromId;
                 int neighborIndex = indexOf(nodeIds, neighbor);
                 if (!visited[neighborIndex]) {

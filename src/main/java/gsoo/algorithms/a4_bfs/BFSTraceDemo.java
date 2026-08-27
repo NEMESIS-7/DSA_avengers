@@ -1,8 +1,7 @@
 package gsoo.algorithms.a4_bfs;
 
-import gsoo.structures.Graph;
-import gsoo.structures.Graph.Edge;
 import gsoo.structures.a4_queue_circular_queue.DynamicQueue;
+import gsoo.structures.c5_graph_adjacency_matrix.Graph;
 
 public class BFSTraceDemo {
 
@@ -69,8 +68,8 @@ public class BFSTraceDemo {
             visitCount++;
 
             StringBuilder newlyVisited = new StringBuilder();
-            Edge[] edges = graph.getNeighbors(current);
-            for (Edge e : edges) {
+            Graph.Edge[] edges = graph.getNeighbors(current);
+            for (Graph.Edge e : edges) {
                 String neighbor = e.fromId.equals(current) ? e.toId : e.fromId;
                 int neighborIndex = indexOf(nodeIds, neighbor);
                 if (!visited[neighborIndex]) {
