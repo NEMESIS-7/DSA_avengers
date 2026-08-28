@@ -9,6 +9,7 @@ import gsoo.algorithms.b2_merge_sort.MergeSort;
 import gsoo.algorithms.b3_brute_force.BruteForceAssignment;
 import gsoo.algorithms.b4_selection_sort.SelectionSort;
 import gsoo.algorithms.c1_greedy.GreedyAssignment;
+import gsoo.algorithms.c2_dijkstra.Dijkstra;
 import gsoo.algorithms.c3_kruskal.Kruskal;
 import gsoo.algorithms.c4_prim.PrimMST;
 import gsoo.algorithms.c5_dp_knapsack.HospitalKnapsackPlanner;
@@ -28,6 +29,7 @@ import gsoo.structures.a5_deque.CustomDeque;
 import gsoo.structures.b2_avl_tree.AVLTree;
 import gsoo.structures.b4_hash_table.HashTable;
 import gsoo.structures.c1_set.HashSet;
+import gsoo.structures.c2_heap.Heap;
 import gsoo.structures.c5_graph_adjacency_matrix.AdjacencyMatrixGraph;
 
 import java.sql.SQLException;
@@ -51,10 +53,8 @@ import java.util.Scanner;
  * order (array order) and the pod grouping (each chapter's {@code pod} tag) —
  * adding a chapter for a newly-merged slot is one array entry, not a rewrite.
  *
- * Only as true a story as what's actually merged: no priority queue or
- * shortest-path routing exists yet (C2 — heap and Dijkstra), so the
- * walkthrough stops short of an actual live dispatch/routing decision.
- * Each chapter says so where it applies.
+ * Only as true a story as what's actually merged — all 15 slots now have
+ * real, tested code wired in here.
  */
 public class Main {
 
@@ -69,6 +69,8 @@ public class Main {
             new Chapter("b5", "B", "Look up its category volume", Main::categoryVolumeChapter),
             new Chapter("b3a", "B", "Confirm it in the request index (B-tree)", Main::requestIndexChapter),
             new Chapter("c4", "C", "Look at its location's road connections", Main::graphChapter),
+            new Chapter("c2a", "C", "Priority dispatch queue — heap", Main::heapDispatchChapter),
+            new Chapter("c2b", "C", "Fastest route, multi-hop — Dijkstra", Main::dijkstraChapter),
             new Chapter("b1", "B", "Sort today's queue by urgency (quicksort)", Main::quickSortChapter),
             new Chapter("b3b", "B", "Brute-force assign 3 porters to 3 jobs", Main::bruteForceChapter),
             new Chapter("b2a", "B", "Stress-test the AVL tree's balance", Main::avlChapter),
@@ -350,8 +352,57 @@ public class Main {
         for (Graph.Edge e : neighbors) {
             System.out.println("  " + e.fromId + " -> " + e.toId + " cost=" + e.effectiveCost());
         }
-        System.out.println("(Multi-hop shortest path needs Dijkstra — C2's heap and Dijkstra "
-                + "aren't merged yet, so this chapter stops at direct connections.)");
+        System.out.println("(Deliberately stops at direct connections — see the Dijkstra chapter "
+                + "for the real multi-hop fastest route from here.)");
+    }
+
+    private static void heapDispatchChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        ServiceRequest[] pending = allWithStatus(session.requests, "PENDING");
+        Heap<ServiceRequest> dispatchQueue = new Heap<>();
+        for (ServiceRequest r : pending) {
+            long minutesUntilDeadline = 60; // placeholder slack window shared by every request in this demo
+            double priority = Config.dispatchPriority(r.urgency, 1.0, minutesUntilDeadline);
+            dispatchQueue.insert(r, -priority); // heap is min-first; negate so higher priority extracts first
+        }
+        System.out.println("Loaded " + dispatchQueue.size()
+                + " real PENDING requests into C2's priority heap, keyed by Config.dispatchPriority.");
+
+        System.out.println("First 3 to be served under real urgency-weighted priority:");
+        for (int i = 0; i < 3 && !dispatchQueue.isEmpty(); i++) {
+            ServiceRequest r = dispatchQueue.extractMin();
+            String marker = r.requestId.equals(session.focusRequest.requestId) ? "  <- today's focus request" : "";
+            System.out.println("  " + r + marker);
+        }
+        System.out.println(dispatchQueue.size() + " remain in the queue.");
+        System.out.println("(Contrast with the FIFO walk-in line chapter — same real requests, "
+                + "but urgency now actually decides who goes first.)");
+    }
+
+    private static void dijkstraChapter() {
+        if (!requireLoaded()) {
+            return;
+        }
+        ServiceRequest r = session.focusRequest;
+        Dijkstra.Result result = Dijkstra.shortestPaths(session.graph, r.sourceLocationId);
+        System.out.println("Dijkstra from " + r.sourceLocationId + " (" + r.requestId + "'s origin), "
+                + result.nodeIds.length + " nodes, " + result.finalizeOrder.length + " finalized.");
+
+        if (result.isReachable(r.destinationLocationId)) {
+            String[] path = result.pathTo(r.destinationLocationId);
+            System.out.println("Fastest route to " + r.destinationLocationId + " ("
+                    + String.format("%.1f", result.distance[indexOf(result.nodeIds, r.destinationLocationId)])
+                    + " effective cost, " + path.length + " hops):");
+            System.out.println("  " + String.join(" -> ", path));
+        } else {
+            System.out.println(r.destinationLocationId + " is not reachable from " + r.sourceLocationId
+                    + " under the current road-closure state.");
+        }
+        System.out.println("(Closed roads are skipped entirely; flood-prone roads "
+                + "(roadConditionWeight >= " + Config.FLOOD_PRONE_WEIGHT_THRESHOLD
+                + ") additionally carry Config.ROUTE_PENALTY, per team-charter.md sec2.7.)");
     }
 
     private static void opdQueueChapter() {
@@ -374,8 +425,8 @@ public class Main {
             System.out.println("  " + r + marker);
         }
         System.out.println(walkInLine.size() + " remain in the line.");
-        System.out.println("(Pure FIFO ignores urgency entirely — that's exactly why C2's priority "
-                + "heap, not merged yet, is what the real dispatch queue needs instead of this.)");
+        System.out.println("(Pure FIFO ignores urgency entirely — see the priority dispatch queue "
+                + "chapter for what C2's heap does instead with these same real requests.)");
     }
 
     private static void porterRosterChapter() {
@@ -445,8 +496,8 @@ public class Main {
                 + Arrays.toString(result.assignment));
         System.out.println("Total cost: " + result.totalCost);
         System.out.println("Permutations tried: " + result.permutationsTried);
-        System.out.println("(Costs use the real road graph where a direct edge exists; falls back "
-                + "to a fixed penalty otherwise, since multi-hop routing needs Dijkstra, not merged yet.)");
+        System.out.println("(Deliberately uses direct-edge cost only, not full Dijkstra routing, to "
+                + "keep this a fast 3x3 illustration — the Dijkstra chapter shows the real multi-hop cost.)");
     }
 
     private static void avlChapter() {
@@ -903,6 +954,15 @@ public class Main {
             }
         }
         return Arrays.copyOf(found, count);
+    }
+
+    private static int indexOf(String[] arr, String target) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i].equals(target)) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("not found: " + target);
     }
 
     private static final int NO_DIRECT_ROAD_PENALTY = 9999;

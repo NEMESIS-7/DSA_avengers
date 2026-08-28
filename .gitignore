@@ -11,3 +11,12 @@ target/
 
 # Logs
 *.log
+/src/main/java/gsoo/app/Config.java
+/docs/architecture.md
+/docs/codebase-report.md
+/docs/meeting-cheat-sheet.md
+/docs/full-story-walkthrough.md
+/docs/presentation-script.md
+/docs/project-overview.md
+/src/main/java/gsoo/dashboard/
+/dashboard/

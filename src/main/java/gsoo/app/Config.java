@@ -1,5 +1,7 @@
 package gsoo.app;
 
+import gsoo.structures.Graph;
+
 /**
  * All tunable parameters live here, per the assignment brief's
  * "nothing hardcoded" rule — the examiner can be shown this class as
@@ -25,6 +27,29 @@ public final class Config {
     public static final double ROUTE_PENALTY = 1.0 + ((S % 20) / 10.0);
     public static final long RANDOM_SEED = S;
     public static final int SHIFT_BUDGET_MINUTES = 240 + (S % 120);
+
+    /**
+     * Flood-prone / infection-control-restricted roads are the ones whose
+     * roadConditionWeight already exceeds the 1.0 "good/flat" baseline.
+     * C2's Dijkstra charges ROUTE_PENALTY on top of those (team-charter.md
+     * §2.7) — anything with weight >= this threshold counts.
+     */
+    public static final double FLOOD_PRONE_WEIGHT_THRESHOLD = 1.5;
+
+    /**
+     * Routing cost for Dijkstra: the single project-wide effective cost
+     * ({@link Graph.Edge#effectiveCost()} — never recomputed here) plus
+     * ROUTE_PENALTY on flood-prone edges (team-charter.md §2.4, §2.7).
+     * Kruskal and Prim intentionally do NOT apply this penalty — the
+     * charter scopes routePenalty to "C2 Dijkstra" only.
+     */
+    public static double effectiveEdgeCost(Graph.Edge edge) {
+        double base = edge.effectiveCost();
+        if (edge.roadConditionWeight >= FLOOD_PRONE_WEIGHT_THRESHOLD) {
+            return base * ROUTE_PENALTY;
+        }
+        return base;
+    }
 
     /** priority = urgencyWeight x urgency + slackFactor / max(1, minutesUntilDeadline) */
     public static double dispatchPriority(int urgency, double slackFactor, long minutesUntilDeadline) {
